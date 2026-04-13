@@ -323,7 +323,7 @@
     function validarCPF(cpf) {
         cpf = cpf.replace(/[^\d]+/g, '');
         if (cpf == '') return false;
-        if (cpf.length != 11 || /^(\d)\1{10}$/.test(cpf)) return false; // Elimina CPFs invalidos tipo 11111111111
+        if (cpf.length != 11 || /^(\d)\1{10}$/.test(cpf)) return false; 
         
         let add = 0, rev = 0;
         for (let i = 0; i < 9; i++) add += parseInt(cpf.charAt(i)) * (10 - i);
@@ -399,7 +399,6 @@
         let fotoLocalInput = document.getElementById('foto-local').files[0];
         let fotoAssinaturaInput = document.getElementById('foto-assinatura').files[0];
         
-        // Validações Obrigatórias Básicas
         if(!nome || !cpf) {
             return alert("⚠️ Atenção: Preencha Nome Completo e CPF!");
         }
@@ -409,12 +408,10 @@
             return alert("❌ CPF INVÁLIDO!!! Verifique o número digitado.");
         }
 
-        // Validações Condicionais
         if (selEmpresa === 'Outra Empresa' && !txtEmpresa) return alert("⚠️ Qual empresa? Este campo é obrigatório!");
         if (selFuncao === 'Outra Função' && !txtFuncao) return alert("⚠️ Qual função? Este campo é obrigatório!");
         if (selObra === 'Outra Obra' && !txtObra) return alert("⚠️ Qual Obra? Este campo é obrigatório!");
 
-        // Validação das fotos na criação
         if (indiceEdicao < 0 && (!fotoLocalInput || !fotoAssinaturaInput)) {
             return alert("⚠️ Atenção: As fotos do Local e da Assinatura são obrigatórias!");
         }
@@ -495,7 +492,6 @@
             if(item.fotoAssinatura) fotosHTML += `<div class="anexo-box"><span class="legenda-foto">Assin.</span><img src="${item.fotoAssinatura}" class="foto-miniatura" onclick="verFoto('${item.fotoAssinatura}')"></div>`;
             fotosHTML += `</div>`;
             
-            // Decisão sobre o que exibir se for "Outra..."
             let displayEmpresa = item.empresa_sel === 'Outra Empresa' ? item.empresa_txt : item.empresa_sel;
             let displayFuncao = item.funcao_sel === 'Outra Função' ? item.funcao_txt : item.funcao_sel;
             let displayObra = item.obra_sel === 'Outra Obra' ? item.obra_txt : item.obra_sel;
@@ -551,6 +547,15 @@
             localStorage.removeItem('wm_registros_refeicao');
             window.location.reload();
         } 
+    }
+
+    // REGISTRO DO SERVICE WORKER (Para instalar o App e rodar Offline)
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Service Worker registrado com sucesso!', reg))
+                .catch(err => console.log('Erro ao registrar Service Worker:', err));
+        });
     }
 </script>
 </body>
