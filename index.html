@@ -10,7 +10,7 @@
     <link rel="icon" type="image/png" href="icone_v3.png">
 
     <script>
-        // Bloqueio de inspeção
+        // Bloqueio de F12 e inspeção
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.addEventListener('keydown', function(e) {
             if (e.key === 'F12' || 
@@ -33,11 +33,11 @@
 
         body { 
             font-family: Arial, sans-serif; background-color: #ccc; margin: 0; display: flex; justify-content: center; padding: 10px; 
-            -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; -webkit-touch-callout: none; 
+            /* Trava de user-select removida para corrigir o bug do teclado offline no celular */
         }
         
         input, select, textarea {
-            -webkit-user-select: auto; -moz-user-select: auto; -ms-user-select: auto; user-select: auto;
+            box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; width: 100%; padding: 10px;
         }
 
         .app-container { width: 100%; max-width: 700px; background-color: var(--fundo); min-height: 95vh; border: 8px solid; border-image: linear-gradient(to right, var(--azul-wm) 50%, var(--laranja-wm) 50%) 1; box-shadow: 0 5px 15px rgba(0,0,0,0.3); box-sizing: border-box; position: relative; }
@@ -55,7 +55,6 @@
         
         .formulario { display: flex; flex-direction: column; gap: 10px; }
         label { font-size: 12px; font-weight: bold; color: #555; margin-top: 5px; }
-        input, select { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
         
         .btn-salvar { background-color: var(--azul-wm); color: white; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .btn-ver-planilha { background-color: var(--laranja-wm); color: white; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 5px;}
@@ -83,10 +82,12 @@
         .texto-cabecalho h3 { margin: 0; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .texto-cabecalho small { color: #555; font-size: 9px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Campos condicionais escondidos por padrão */
         .campo-condicional { display: none; background: #fff3cd; padding: 8px; border-left: 3px solid #ffc107; margin-top: 5px; border-radius: 3px; }
-
         .erro-msg { color: var(--vermelho-neg); font-size: 11px; font-weight: bold; display: none; margin-top: 3px; }
+
+        .lembrar-box { display: flex; align-items: center; gap: 10px; background: #e2e8f0; padding: 12px; border-radius: 5px; margin-top: 5px; border: 1px solid #cbd5e1; cursor: pointer; }
+        .lembrar-box input[type="checkbox"] { width: 22px; height: 22px; cursor: pointer; margin: 0; flex-shrink: 0; }
+        .lembrar-box label { font-size: 13px; font-weight: bold; color: #334155; margin: 0; cursor: pointer; line-height: 1.2; }
 
         @media print {
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -119,7 +120,7 @@
         .login-box img { max-height: 60px; margin-bottom: 10px; object-fit: contain; pointer-events: none; }
     </style>
 </head>
-<body ondragstart="return false;" ondrop="return false;">
+<body>
 
 <div id="tela-login">
     <div class="login-box">
@@ -141,7 +142,7 @@
     <div id="tela-principal">
         <header>
             <div class="logos-container">
-                <img src="LOGOTIPO.jpg" alt="WM" class="logo-wm">
+                <img src="LOGOTIPO.jpg" alt="WM">
                 <img src="Captura de tela 2026-02-13 132630.jpg" alt="Controladoria" class="logo-controladoria">
             </div>
             <div class="titulo-header">🍽️ AWM REFEIÇÕES 🍽️</div>
@@ -217,6 +218,11 @@
                 <input type="file" id="foto-assinatura" accept="image/*" capture="environment">
             </div>
 
+            <div class="lembrar-box" onclick="document.getElementById('lembrar-dados').click();">
+                <input type="checkbox" id="lembrar-dados" onclick="event.stopPropagation();">
+                <label for="lembrar-dados" onclick="event.stopPropagation();">Salvar meus dados (Nome, CPF, Empresa, Função e Obra) para a próxima vez</label>
+            </div>
+
             <button class="btn-salvar" id="btn-salvar-principal" onclick="salvarRefeicao()">✅ Enviar (Salvar Registro)</button>
             <button class="btn-ver-planilha" onclick="abrirPlanilha()">📊 Ver Registros Diários</button>
         </div>
@@ -280,8 +286,25 @@
             document.getElementById('tela-login').style.display = 'none';
         }
         calcularTotal();
-        verificarCondicionais();
+        carregarDadosLembrados(); // Chama a função para puxar dados salvos
     };
+
+    // Nova Função: Carregar os dados salvos pela caixinha
+    function carregarDadosLembrados() {
+        let dadosLembrados = JSON.parse(localStorage.getItem('wm_dados_usuario'));
+        if (dadosLembrados) {
+            document.getElementById('lembrar-dados').checked = true;
+            document.getElementById('nome-completo').value = dadosLembrados.nome || '';
+            document.getElementById('cpf').value = dadosLembrados.cpf || '';
+            document.getElementById('empresa').value = dadosLembrados.empresa_sel || 'WM Construções e Montagens';
+            document.getElementById('qual-empresa').value = dadosLembrados.empresa_txt || '';
+            document.getElementById('funcao').value = dadosLembrados.funcao_sel || 'Pedreiro';
+            document.getElementById('qual-funcao').value = dadosLembrados.funcao_txt || '';
+            document.getElementById('obra').value = dadosLembrados.obra_sel || 'Boquira/BA';
+            document.getElementById('qual-obra').value = dadosLembrados.obra_txt || '';
+            verificarCondicionais();
+        }
+    }
 
     async function gerarHash(texto) {
         const encoder = new TextEncoder();
@@ -319,7 +342,6 @@
         document.getElementById('total-registros').innerText = banco.length + " Refeições Registradas";
     }
 
-    // Função de Validação de CPF Real
     function validarCPF(cpf) {
         cpf = cpf.replace(/[^\d]+/g, '');
         if (cpf == '') return false;
@@ -353,7 +375,6 @@
         }
     }
 
-    // Exibe ou oculta campos baseados em "Outros"
     function verificarCondicionais() {
         document.getElementById('div-qual-empresa').style.display = document.getElementById('empresa').value === 'Outra Empresa' ? 'block' : 'none';
         document.getElementById('div-qual-funcao').style.display = document.getElementById('funcao').value === 'Outra Função' ? 'block' : 'none';
@@ -398,6 +419,7 @@
 
         let fotoLocalInput = document.getElementById('foto-local').files[0];
         let fotoAssinaturaInput = document.getElementById('foto-assinatura').files[0];
+        let lembrarMarcado = document.getElementById('lembrar-dados').checked;
         
         if(!nome || !cpf) {
             return alert("⚠️ Atenção: Preencha Nome Completo e CPF!");
@@ -428,16 +450,12 @@
         let item = {
             nome: nome,
             cpf: cpf,
-            
             empresa_sel: selEmpresa,
             empresa_txt: txtEmpresa,
-            
             funcao_sel: selFuncao,
             funcao_txt: txtFuncao,
-            
             obra_sel: selObra,
             obra_txt: txtObra,
-            
             refeicao: document.getElementById('refeicao').value,
             fotoLocal: fLocal,
             fotoAssinatura: fAssinatura,
@@ -457,14 +475,27 @@
         }
 
         try {
+            // Salva na planilha principal
             localStorage.setItem('wm_registros_refeicao', JSON.stringify(banco));
-            document.getElementById('nome-completo').value = '';
-            document.getElementById('cpf').value = '';
-            document.getElementById('qual-empresa').value = '';
-            document.getElementById('qual-funcao').value = '';
-            document.getElementById('qual-obra').value = '';
+
+            // Lógica do Lembrar Dados
+            if (lembrarMarcado) {
+                let dadosPessoais = { nome, cpf, empresa_sel: selEmpresa, empresa_txt: txtEmpresa, funcao_sel: selFuncao, funcao_txt: txtFuncao, obra_sel: selObra, obra_txt: txtObra };
+                localStorage.setItem('wm_dados_usuario', JSON.stringify(dadosPessoais));
+            } else {
+                localStorage.removeItem('wm_dados_usuario');
+                // Se a pessoa não mandou lembrar, apagamos os campos de texto
+                document.getElementById('nome-completo').value = '';
+                document.getElementById('cpf').value = '';
+                document.getElementById('qual-empresa').value = '';
+                document.getElementById('qual-funcao').value = '';
+                document.getElementById('qual-obra').value = '';
+            }
+
+            // Sempre limpamos as fotos para a próxima vez
             document.getElementById('foto-local').value = ''; 
             document.getElementById('foto-assinatura').value = ''; 
+            
             document.getElementById('btn-salvar-principal').innerText = "✅ Enviar (Salvar Registro)";
             document.getElementById('erro-cpf').style.display = 'none';
             calcularTotal(); 
@@ -518,16 +549,12 @@
         let it = banco[index];
         document.getElementById('nome-completo').value = it.nome;
         document.getElementById('cpf').value = it.cpf;
-        
         document.getElementById('empresa').value = it.empresa_sel;
         document.getElementById('qual-empresa').value = it.empresa_txt || '';
-        
         document.getElementById('funcao').value = it.funcao_sel;
         document.getElementById('qual-funcao').value = it.funcao_txt || '';
-        
         document.getElementById('obra').value = it.obra_sel;
         document.getElementById('qual-obra').value = it.obra_txt || '';
-
         document.getElementById('refeicao').value = it.refeicao;
         
         verificarCondicionais();
@@ -549,11 +576,11 @@
         } 
     }
 
-    // REGISTRO DO SERVICE WORKER (Para instalar o App e rodar Offline)
+    // REGISTRO DO SERVICE WORKER
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('Service Worker registrado com sucesso!', reg))
+                .then(reg => console.log('Service Worker registrado com sucesso!'))
                 .catch(err => console.log('Erro ao registrar Service Worker:', err));
         });
     }
