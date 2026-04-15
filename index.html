@@ -1,309 +1,683 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AWM REFEIÇÕES - WM Construções</title>
-    <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#002D5B">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WM Construções - Refeições</title>
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icone_v3.png">
+    <link rel="icon" type="image/png" href="icone_v3.png">
+
+    <script>
+        // Bloqueio de F12 e inspeção
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || 
+               (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+               (e.ctrlKey && (e.key === 'U' || e.key === 'S' || e.key === 'C'))) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    </script>
+
     <style>
         :root {
-            --azul-wm: #002D5B;
-            --laranja-wm: #F2A900;
-            --cinza-fundo: #f8f9fa;
+            --azul-wm: #1a233a; 
+            --laranja-wm: #f39c12; 
+            --verde-pos: #28a745;
+            --vermelho-neg: #dc3545;
+            --fundo: #f4f7f6;
         }
 
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: var(--cinza-fundo);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            border-left: 12px solid var(--laranja-wm);
-            border-right: 12px solid var(--laranja-wm);
-            min-height: 100vh;
+        body { font-family: Arial, sans-serif; background-color: #ccc; margin: 0; display: flex; justify-content: center; padding: 10px; }
+
+        input, select, textarea {
+            box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; width: 100%; padding: 10px; margin-top: 3px;
         }
 
-        .container {
-            width: 100%;
-            max-width: 480px;
-            background: white;
-            padding: 15px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
-        }
+        .app-container { width: 100%; max-width: 700px; background-color: var(--fundo); min-height: 95vh; border: 8px solid; border-image: linear-gradient(to right, var(--azul-wm) 50%, var(--laranja-wm) 50%) 1; box-shadow: 0 5px 15px rgba(0,0,0,0.3); box-sizing: border-box; position: relative; }
 
-        /* Cabeçalho */
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
+        header { background-color: white; color: var(--azul-wm); padding: 15px 10px; text-align: center; font-weight: bold; display: flex; flex-direction: column; align-items: center; gap: 10px; border-bottom: 2px solid #ddd; }
 
-        .logo-box { display: flex; align-items: center; gap: 10px; }
-        .logo-wm { width: 90px; }
-        .logo-35 { width: 45px; }
+        .logos-container { display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 15px; width: 100%; box-sizing: border-box; padding: 0 10px; overflow: hidden; }
+        .logo-wm, .logo-controladoria { max-width: 45%; max-height: 60px; object-fit: contain; pointer-events: none; }
 
-        .stamp {
-            border: 2px solid #666;
-            padding: 4px 8px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 11px;
-            background: #f0f0f0;
-            color: #222;
-            line-height: 1.2;
-        }
+        .titulo-header { font-size: 15px; color: var(--laranja-wm); margin-top: 5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
 
-        .app-title {
-            text-align: center;
-            color: var(--laranja-wm);
-            font-weight: bold;
-            font-size: 1.1rem;
-            margin: 15px 0;
-            text-transform: uppercase;
-        }
+        .painel-saldo, .formulario, .area-acoes { background: white; margin: 10px; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .saldo-atual { font-size: 20px; font-weight: bold; text-align: center; margin-top: 5px; color: var(--azul-wm); }
 
-        /* Contador */
-        .counter-box {
-            background: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 12px;
-            text-align: center;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        .counter-box h2 { margin: 0; font-size: 22px; color: #333; }
-        .counter-box p { margin: 2px 0 0; font-size: 13px; color: #888; }
-
-        /* Formulário */
-        .form-row { margin-bottom: 15px; }
+        .formulario { display: flex; flex-direction: column; gap: 8px; }
         
-        .label-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
+        .label-linha { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 8px; }
+        label { font-size: 12px; font-weight: bold; color: #555; }
+        .chk-pequeno { font-size: 10px; color: #333; display: flex; align-items: center; gap: 4px; font-weight: normal; cursor: pointer; background: #e2e8f0; padding: 3px 6px; border-radius: 4px; border: 1px solid #cbd5e1; }
+        .chk-pequeno input { width: 14px; height: 14px; margin: 0; cursor: pointer; padding: 0; }
+
+        .btn-salvar { background-color: var(--azul-wm); color: white; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        .btn-ver-planilha { background-color: var(--laranja-wm); color: white; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 5px;}
+
+        .area-acoes { display: flex; flex-wrap: wrap; gap: 10px; }
+        .btn-pausar { background-color: #17a2b8; color: white; border: none; padding: 12px; font-size: 14px; border-radius: 5px; flex: 1; font-weight: bold; }
+        .btn-whats { background-color: #25D366; color: white; border: none; padding: 15px; font-size: 14px; border-radius: 5px; flex: 1 1 100%; font-weight: bold; cursor: pointer; }
+        .btn-encerrar { background-color: var(--vermelho-neg); color: white; border: none; padding: 12px; font-size: 13px; border-radius: 5px; flex: 1 1 100%; font-weight: bold; margin-top: 5px; }
+
+        #tela-planilha { display: none; padding: 10px; background: white; min-height: 90vh; }
+        .tabela-container { overflow-x: auto; margin-top: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%; }
+
+        table { width: 100%; min-width: 800px; border-collapse: collapse; font-size: 11px; background: white; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; vertical-align: middle; }
+        th { background-color: var(--azul-wm); color: white; }
+
+        .foto-miniatura { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; cursor: pointer; display: block; margin-top: 3px; }
+        .anexo-box { display: flex; flex-direction: column; align-items: center; margin-bottom: 5px; background: #f9f9f9; padding: 5px; border-radius: 4px; border: 1px solid #eee; text-align: center; max-width: 80px; }
+        .legenda-foto { font-size: 9px; font-weight: bold; color: var(--azul-wm); word-wrap: break-word; text-align: center; }
+
+        .cabecalho-oficial { display: block; font-size: 13px; line-height: 1.4; background: white; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 10px; overflow: hidden; }
+        .cabecalho-topo { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 5px; gap: 5px; }
+        .img-cabecalho { height: 45px; max-width: 28%; object-fit: contain; border-radius: 4px; }
+        .texto-cabecalho { text-align: center; flex: 1; min-width: 0; }
+        .texto-cabecalho h3 { margin: 0; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .texto-cabecalho small { color: #555; font-size: 9px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .campo-condicional { display: none; background: #fff3cd; padding: 8px; border-left: 3px solid #ffc107; margin-top: 5px; border-radius: 3px; }
+        .erro-msg { color: var(--vermelho-neg); font-size: 11px; font-weight: bold; display: none; margin-top: 3px; }
+
+        @media print {
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            @page { size: landscape; margin: 0.5cm; }
+            body, html { display: block !important; background-color: white !important; height: auto !important; min-height: auto !important; overflow: visible !important; margin: 0 !important; padding: 0 !important; }
+            .app-container { border: none !important; box-shadow: none !important; max-width: 100% !important; width: 100% !important; display: block !important; height: auto !important; min-height: auto !important; overflow: visible !important; padding: 0 !important; margin: 0 !important; }
+            .formulario, .area-acoes, .btn-voltar, .btn-ver-planilha, th:last-child, td:last-child { display: none !important; }
+            #tela-planilha, .tabela-container { display: block !important; overflow: visible !important; height: auto !important; width: 100% !important; margin: 0 !important; padding: 0 !important; border: none !important; }
+            table { display: table !important; font-size: 9px !important; width: 100% !important; margin-top: 5px !important; table-layout: fixed !important; word-wrap: break-word !important; }
+            tr { display: table-row !important; page-break-inside: avoid; }
+            th, td { display: table-cell !important; padding: 4px !important; }
+            .cabecalho-oficial { border: 1px solid #000 !important; padding: 8px !important; margin-bottom: 5px !important; border-radius: 0 !important; }
+            .foto-miniatura { width: 60px !important; height: auto !important; max-height: 60px !important; object-fit: contain !important; }
         }
 
-        label { font-weight: bold; font-size: 14px; color: #444; }
+        #modal-foto { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; }
+        #foto-ampliada { max-width: 90%; max-height: 80%; border: 3px solid white; pointer-events: none; }
 
-        .save-indicator {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            background: #e8f5e9;
-            color: #2e7d32;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 11px;
-            border: 1px solid #c8e6c9;
+        #tela-login {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--azul-wm); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
-
-        input, select {
-            width: 100%;
-            padding: 11px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 16px;
-            background-color: #fafafa;
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 14px;
-            background-color: var(--azul-wm);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-            text-transform: uppercase;
-        }
-
-        .submit-btn:active { background-color: #001a35; }
+        .login-box { background: white; padding: 25px; border-radius: 10px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .login-box img { max-height: 60px; margin-bottom: 10px; object-fit: contain; pointer-events: none; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header class="header">
-        <div class="logo-box">
-            <img src="LOGOTIPO.jpg" alt="WM" class="logo-wm">
-            <img src="Captura%20de%20tela%202026-02-13%20132630.jpg" alt="35 anos" class="logo-35">
-        </div>
-        <div class="stamp">
-            ANDERSON REZENDE<br>
-            SETOR DE CONTROLADORIA
-        </div>
-    </header>
+<div id="tela-login">
+    <div class="login-box">
+        <img src="LOGOTIPO.jpg" alt="Logo WM">
+        <h3 style="color: var(--azul-wm); margin-top: 0; margin-bottom: 5px;">ACESSO RESTRITO</h3>
+        <p style="color: #666; font-size: 12px; margin-bottom: 5px;">WM Construções - Refeições</p>
 
-    <div class="app-title">🍴 AWM REFEIÇÕES 🍴</div>
+        <div style="position: relative; width: 100%; margin: 15px 0;">
+            <input type="password" id="senha-input" placeholder="SENHA" style="width: 100%; margin: 0; padding-right: 40px; text-align: center; font-size: 20px; font-weight: bold; letter-spacing: 2px;">
+            <img id="icone-olho" src="OLHOFECHADO_V2.png" onclick="mostrarSenha()" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; height: 26px; width: 26px; object-fit: contain; pointer-events: auto;" title="Mostrar/Ocultar Senha">
+        </div>
 
-    <div class="counter-box">
-        <h2 id="display-contagem">0 Refeições Registradas</h2>
-        <p>(Neste dispositivo)</p>
+        <button class="btn-salvar" style="width: 100%; font-size: 16px; padding: 15px;" onclick="validarAcesso()">ENTRAR NO APP</button>
+        <p id="erro-login" style="color: red; font-size: 13px; font-weight: bold; display: none; margin-top: 15px;">❌ Senha incorreta!</p>
     </div>
+</div>
 
-    <form id="mealForm">
-        <div class="form-row">
-            <div class="label-container">
+<div class="app-container">
+    <div id="tela-principal">
+        <header>
+            <div class="logos-container">
+                <img src="LOGOTIPO.jpg" alt="WM" class="logo-wm">
+                <img src="Captura de tela 2026-02-13 132630.jpg" alt="Controladoria" class="logo-controladoria">
+            </div>
+            <div class="titulo-header">🍽️ AWM REFEIÇÕES 🍽️</div>
+        </header>
+
+        <div class="painel-saldo">
+            <div class="saldo-atual" id="total-registros">0 Refeições Registradas</div>
+            <p style="text-align: center; font-size: 11px; color: #777; margin-top: 5px;">(Neste dispositivo)</p>
+        </div>
+
+        <div class="formulario">
+            
+            <div class="label-linha">
                 <label>Nome completo: <span style="color:red">*</span></label>
-                <div class="save-indicator">
-                    <input type="checkbox" id="chk_nome" style="width:auto;"> ✅ Salvar
-                </div>
+                <label class="chk-pequeno" title="Deixar gravado para o próximo registro"><input type="checkbox" id="chk-nome"> ✅ Salvar</label>
             </div>
-            <input type="text" id="nome" placeholder="Digite o nome completo" required>
-        </div>
+            <input type="text" id="nome-completo" placeholder="Digite o nome completo">
 
-        <div class="form-row">
-            <div class="label-container">
+            <div class="label-linha">
                 <label>CPF: <span style="color:red">*</span></label>
-                <div class="save-indicator">
-                    <input type="checkbox" id="chk_cpf" style="width:auto;"> ✅ Salvar
-                </div>
+                <label class="chk-pequeno"><input type="checkbox" id="chk-cpf"> ✅ Salvar</label>
             </div>
-            <input type="text" id="cpf" placeholder="000.000.000-00" required maxlength="14">
-        </div>
+            <input type="text" id="cpf" placeholder="000.000.000-00" oninput="mascaraCPF(this)" onkeyup="verificarErroCPF()">
+            <div id="erro-cpf" class="erro-msg">CPF INVÁLIDO!!!</div>
 
-        <div class="form-row">
-            <div class="label-container">
+            <div class="label-linha">
                 <label>Empresa: <span style="color:red">*</span></label>
-                <div class="save-indicator">
-                    <input type="checkbox" id="chk_empresa" style="width:auto;"> ✅ Salvar
-                </div>
+                <label class="chk-pequeno"><input type="checkbox" id="chk-empresa"> ✅ Salvar</label>
             </div>
-            <select id="empresa" required>
-                <option value="">--- Selecione na lista ---</option>
+            <select id="empresa" onchange="verificarCondicionais()">
+                <option value="" disabled selected>--- Selecione na lista suspensa ---</option>
                 <option value="WM Construções e Montagens">WM Construções e Montagens</option>
-                <option value="Terceirizado">Terceirizado</option>
+                <option value="Outra Empresa">Outra Empresa</option>
             </select>
-        </div>
+            <div id="div-qual-empresa" class="campo-condicional">
+                <label>Qual empresa? <span style="color:red">*</span></label>
+                <input type="text" id="qual-empresa" placeholder="Digite o nome da empresa">
+            </div>
 
-        <div class="form-row">
-            <div class="label-container">
+            <div class="label-linha">
                 <label>Função (Digite para buscar): <span style="color:red">*</span></label>
-                <div class="save-indicator">
-                    <input type="checkbox" id="chk_funcao" style="width:auto;"> ✅ Salvar
-                </div>
+                <label class="chk-pequeno"><input type="checkbox" id="chk-funcao"> ✅ Salvar</label>
             </div>
-            <input type="text" id="funcao" placeholder="Ex: Armador" required>
-        </div>
+            <input list="lista-funcoes" id="funcao" placeholder="--- Digite ou selecione na lista ---">
+            <datalist id="lista-funcoes">
+                <option value="Ajudante Geral">
+                <option value="Almoxarife">
+                <option value="Armador">
+                <option value="Carpinteiro">
+                <option value="Eletricista de Manutenção">
+                <option value="Eletricista Montador">
+                <option value="Encarregado de Obras">
+                <option value="Encarregado de Montagem">
+                <option value="Engenheiro Civil">
+                <option value="Engenheiro Eletricista">
+                <option value="Guindasteiro">
+                <option value="Marteleteiro">
+                <option value="Mecânico de Manutenção">
+                <option value="Montador de Estruturas">
+                <option value="Motorista de Munck">
+                <option value="Operador de Escavadeira">
+                <option value="Pedreiro">
+                <option value="Pintor">
+                <option value="Servente">
+                <option value="Soldador">
+                <option value="Técnico de Segurança do Trabalho">
+                <option value="Topógrafo">
+            </datalist>
 
-        <div class="form-row">
-            <div class="label-container">
+            <div class="label-linha">
                 <label>Obra: <span style="color:red">*</span></label>
-                <div class="save-indicator">
-                    <input type="checkbox" id="chk_obra" style="width:auto;"> ✅ Salvar
-                </div>
+                <label class="chk-pequeno"><input type="checkbox" id="chk-obra"> ✅ Salvar</label>
             </div>
-            <select id="obra" required>
-                <option value="">--- Selecione na lista ---</option>
+            <select id="obra" onchange="verificarCondicionais()">
+                <option value="" disabled selected>--- Selecione na lista suspensa ---</option>
                 <option value="Boquira/BA">Boquira/BA</option>
                 <option value="Brumado/BA">Brumado/BA</option>
+                <option value="Paratinga/BA">Paratinga/BA</option>
+                <option value="Paulo Afonso/BA">Paulo Afonso/BA</option>
+                <option value="Pratudão/BA">Pratudão/BA</option>
                 <option value="Cachoeirinha/PE">Cachoeirinha/PE</option>
-                <option value="Ribeirão/SP">Ribeirão/SP</option>
+                <option value="Ribeirão/PE">Ribeirão/PE</option>
+                <option value="Ceará-Mirim/RN">Ceará-Mirim/RN</option>
+                <option value="Manutenção Geral/RN">Manutenção Geral/RN</option>
+                <option value="Outra Obra">Outra Obra (Adicionar)</option>
             </select>
-        </div>
-
-        <div class="form-row">
-            <div class="label-container">
-                <label>Restaurante: <span style="color:red">*</span></label>
-                <div class="save-indicator">
-                    <input type="checkbox" id="chk_restaurante" style="width:auto;"> ✅ Salvar
-                </div>
+            <div id="div-qual-obra" class="campo-condicional">
+                <label>Qual Obra? <span style="color:red">*</span></label>
+                <input type="text" id="qual-obra" placeholder="Digite o nome da obra">
             </div>
-            <select id="restaurante" required>
-                <option value="">--- Selecione na lista ---</option>
-                <option value="Restaurante Mangai">Restaurante Mangai</option>
-                <option value="Cantina Interna">Cantina Interna</option>
-            </select>
-        </div>
 
-        <div class="form-row">
-            <label>Refeição: <span style="color:red">*</span></label>
-            <select id="refeicao" required>
-                <option value="">--- Selecione ---</option>
-                <option value="Café">Café</option>
+            <div class="label-linha">
+                <label>Restaurante: <span style="color:red">*</span></label>
+                <label class="chk-pequeno"><input type="checkbox" id="chk-restaurante"> ✅ Salvar</label>
+            </div>
+            <select id="restaurante" onchange="verificarCondicionais()">
+                <option value="" disabled selected>--- Selecione na lista suspensa ---</option>
+                <option value="Restaurante Mangai">Restaurante Mangai</option>
+                <option value="Restaurante Arco Verde">Restaurante Arco Verde</option>
+                <option value="Outro Restaurante">Outro Restaurante (Adicionar)</option>
+            </select>
+            <div id="div-qual-restaurante" class="campo-condicional">
+                <label>Qual Restaurante? <span style="color:red">*</span></label>
+                <input type="text" id="qual-restaurante" placeholder="Digite o nome do restaurante">
+            </div>
+
+            <div class="label-linha">
+                <label>Refeição: <span style="color:red">*</span></label>
+                <label class="chk-pequeno"><input type="checkbox" id="chk-refeicao"> ✅ Salvar</label>
+            </div>
+            <select id="refeicao">
+                <option value="" disabled selected>--- Selecione na lista suspensa ---</option>
+                <option value="Café da manhã">Café da manhã</option>
                 <option value="Almoço">Almoço</option>
                 <option value="Jantar">Jantar</option>
             </select>
+
+            <div class="label-linha">
+                <label>Preço Cobrado (R$):</label>
+                <label class="chk-pequeno"><input type="checkbox" id="chk-preco"> ✅ Salvar</label>
+            </div>
+            <input type="text" id="preco" placeholder="R$ 0,00" oninput="mascaraMoeda(this)">
+
+            <div style="background: #fdf5e6; padding: 10px; border-radius: 5px; border: 1px solid #f39c12; margin-top: 10px;">
+                <label>📸 Foto do Local (obrigatório): <span style="color:red">*</span></label>
+                <input type="file" id="foto-local" accept="image/*" capture="environment">
+
+                <label style="margin-top:10px; display:block;">📸 Foto da assinatura (obrigatório): <span style="color:red">*</span></label>
+                <input type="file" id="foto-assinatura" accept="image/*" capture="environment">
+            </div>
+
+            <button class="btn-salvar" id="btn-salvar-principal" onclick="salvarRefeicao()">✅ Enviar (Salvar Registro)</button>
+            <button class="btn-ver-planilha" onclick="abrirPlanilha()">📊 Ver Registros Diários</button>
         </div>
 
-        <button type="submit" class="submit-btn">REGISTRAR REFEIÇÃO</button>
-    </form>
+        <div class="area-acoes">
+            <button class="btn-pausar" onclick="alert('✅ Os dados estão salvos no seu celular.')">💾 Salvar Rascunho</button>
+            <button class="btn-whats" onclick="gerarPDF()">📲 GERAR RELATÓRIO PDF</button>
+            <button class="btn-encerrar" onclick="encerrarRelatorio()">🏁 Limpar Ficha e Iniciar Nova</button>
+        </div>
+    </div>
+
+    <div id="tela-planilha">
+        <button class="btn-voltar" onclick="voltarParaFormulario()" style="width: 100%; padding: 10px; margin-bottom: 10px; font-weight: bold; background: #555; color: white; border: none; border-radius: 5px; cursor: pointer;">⬅ Voltar para Lançamentos</button>
+
+        <div class="cabecalho-oficial" id="cabecalho-pdf">
+            <div class="cabecalho-topo">
+                <img src="LOGOTIPO.jpg" class="img-cabecalho">
+                <div class="texto-cabecalho">
+                    <h3>CONTROLE DE REFEIÇÕES</h3>
+                    <small id="print-data-emissao"></small>
+                    <small id="print-device-id" style="color: #888; margin-top:3px;"></small>
+                </div>
+                <img src="Captura de tela 2026-02-13 132630.jpg" class="img-cabecalho">
+            </div>
+            <div style="text-align: center; margin-top: 10px; font-weight: bold;">
+                TOTAL DE REFEIÇÕES: <span id="print-total" style="color: red; font-size: 14px;">0</span> | 
+                VALOR TOTAL: <span id="print-valor-total" style="color: green; font-size: 14px;">R$ 0,00</span>
+            </div>
+        </div>
+
+        <div class="tabela-container">
+            <table id="tabela-dados">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Hora</th>
+                        <th>Colaborador / CPF</th>
+                        <th>Empresa / Função</th>
+                        <th>Obra / Restaurante</th>
+                        <th>Refeição</th>
+                        <th>Valor (R$)</th>
+                        <th>Fotos</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="corpo-tabela"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="modal-foto">
+        <img id="foto-ampliada" src="">
+        <button onclick="document.getElementById('modal-foto').style.display='none'" style="margin-top:10px; padding:10px; font-weight: bold; cursor:pointer;">Fechar Imagem</button>
+    </div>
 </div>
 
 <script>
-    // Registro do Service Worker
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js')
-        .then(() => console.log("SW v4 ativo"))
-        .catch(err => console.log("Erro SW:", err));
+    const _s = [53, 52, 52, 102, 55, 55, 97, 49, 102, 50, 50, 97, 51, 53, 50, 99, 52, 49, 54, 48, 56, 53, 56, 98, 50, 100, 55, 56, 55, 99, 98, 97, 57, 53, 55, 54, 98, 101, 54, 100, 55, 48, 98, 48, 101, 100, 53, 51, 98, 55, 52, 97, 56, 49, 51, 57, 99, 97, 56, 54, 49, 97, 54, 49];
+    const HASH_SENHA_MESTRA = String.fromCharCode(..._s);
+
+    window.onload = function() {
+        const autorizado = localStorage.getItem('acesso_refeicoes_concedido');
+        if (autorizado === 'true') {
+            document.getElementById('tela-login').style.display = 'none';
+        }
+        calcularTotal();
+        carregarConfiguracoesSalvas(); 
+    };
+
+    function getDeviceID() {
+        let id = localStorage.getItem('wm_device_id');
+        if (!id) {
+            id = 'ID-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+            localStorage.setItem('wm_device_id', id);
+        }
+        return id;
     }
 
-    document.addEventListener("DOMContentLoaded", function() {
-        const fields = [
-            { id: 'nome', chk: 'chk_nome' },
-            { id: 'cpf', chk: 'chk_cpf' },
-            { id: 'empresa', chk: 'chk_empresa' },
-            { id: 'funcao', chk: 'chk_funcao' },
-            { id: 'obra', chk: 'chk_obra' },
-            { id: 'restaurante', chk: 'chk_restaurante' }
-        ];
+    // Máscara de CPF automática (Exigência: . e -)
+    function mascaraCPF(i){
+        var v = i.value.replace(/\D/g, "");
+        i.setAttribute("maxlength", "14");
+        if (v.length <= 11) {
+            v = v.replace(/(\d{3})(\d)/, "$1.$2");
+            v = v.replace(/(\d{3})(\d)/, "$1.$2");
+            v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+            i.value = v;
+        }
+    }
 
-        // Carregar dados salvos offline
-        fields.forEach(item => {
-            const inputEl = document.getElementById(item.id);
-            const checkEl = document.getElementById(item.chk);
-            
-            const savedValue = localStorage.getItem("wm_val_" + item.id);
-            const shouldKeep = localStorage.getItem("wm_keep_" + item.chk) === "true";
+    // Máscara de Moeda (Ex: R$ 25,50)
+    function mascaraMoeda(i) {
+        let v = i.value.replace(/\D/g, "");
+        if (v === "") {
+            i.value = "";
+            return;
+        }
+        v = (v / 100).toFixed(2) + "";
+        v = v.replace(".", ",");
+        v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+        i.value = "R$ " + v;
+    }
 
-            if (savedValue && shouldKeep) {
-                inputEl.value = savedValue;
-                checkEl.checked = true;
-            }
-
-            inputEl.addEventListener("input", () => {
-                if (checkEl.checked) localStorage.setItem("wm_val_" + item.id, inputEl.value);
-            });
-
-            checkEl.addEventListener("change", () => {
-                localStorage.setItem("wm_keep_" + item.chk, checkEl.checked);
-                if (checkEl.checked) {
-                    localStorage.setItem("wm_val_" + item.id, inputEl.value);
+    function carregarConfiguracoesSalvas() {
+        let configs = JSON.parse(localStorage.getItem('wm_campos_salvos')) || {};
+        
+        ['nome', 'cpf', 'empresa', 'funcao', 'obra', 'restaurante', 'refeicao', 'preco'].forEach(campo => {
+            if (configs[campo] && configs[campo].salvar) {
+                document.getElementById('chk-' + campo).checked = true;
+                
+                if(campo === 'empresa' && configs.empresa.txt) {
+                    document.getElementById('empresa').value = 'Outra Empresa';
+                    document.getElementById('qual-empresa').value = configs.empresa.txt;
+                } else if(campo === 'obra' && configs.obra.txt) {
+                    document.getElementById('obra').value = 'Outra Obra';
+                    document.getElementById('qual-obra').value = configs.obra.txt;
+                } else if(campo === 'restaurante' && configs.restaurante.txt) {
+                    document.getElementById('restaurante').value = 'Outro Restaurante';
+                    document.getElementById('qual-restaurante').value = configs.restaurante.txt;
                 } else {
-                    localStorage.removeItem("wm_val_" + item.id);
+                    document.getElementById(campo === 'nome' ? 'nome-completo' : campo).value = configs[campo].valor;
                 }
-            });
-        });
-
-        // Máscara de CPF
-        const cpfInput = document.getElementById('cpf');
-        cpfInput.addEventListener('input', (e) => {
-            let v = e.target.value.replace(/\D/g, '');
-            if (v.length > 11) v = v.slice(0, 11);
-            v = v.replace(/(\d{3})(\d)/, '$1.$2');
-            v = v.replace(/(\d{3})(\d)/, '$1.$2');
-            v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-            e.target.value = v;
-            if (document.getElementById('chk_cpf').checked) {
-                localStorage.setItem("wm_val_cpf", v);
             }
         });
+        verificarCondicionais();
+    }
 
-        // Envio do formulário
-        document.getElementById('mealForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            alert("Registro realizado com sucesso!");
+    function gravarConfiguracoesSalvas() {
+        let configs = {};
+        
+        let selEmpresa = document.getElementById('empresa').value;
+        let selObra = document.getElementById('obra').value;
+        let selRestaurante = document.getElementById('restaurante').value;
+
+        configs.nome = { salvar: document.getElementById('chk-nome').checked, valor: document.getElementById('nome-completo').value };
+        configs.cpf = { salvar: document.getElementById('chk-cpf').checked, valor: document.getElementById('cpf').value };
+        configs.empresa = { salvar: document.getElementById('chk-empresa').checked, valor: selEmpresa, txt: (selEmpresa === 'Outra Empresa' ? document.getElementById('qual-empresa').value : '') };
+        configs.funcao = { salvar: document.getElementById('chk-funcao').checked, valor: document.getElementById('funcao').value };
+        configs.obra = { salvar: document.getElementById('chk-obra').checked, valor: selObra, txt: (selObra === 'Outra Obra' ? document.getElementById('qual-obra').value : '') };
+        configs.restaurante = { salvar: document.getElementById('chk-restaurante').checked, valor: selRestaurante, txt: (selRestaurante === 'Outro Restaurante' ? document.getElementById('qual-restaurante').value : '') };
+        configs.refeicao = { salvar: document.getElementById('chk-refeicao').checked, valor: document.getElementById('refeicao').value };
+        configs.preco = { salvar: document.getElementById('chk-preco').checked, valor: document.getElementById('preco').value };
+
+        localStorage.setItem('wm_campos_salvos', JSON.stringify(configs));
+    }
+
+    async function gerarHash(texto) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(texto);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function validarAcesso() {
+        const senhaDigitada = document.getElementById('senha-input').value;
+        const hashDigitado = await gerarHash(senhaDigitada);
+        if (hashDigitado === HASH_SENHA_MESTRA) {
+            localStorage.setItem('acesso_refeicoes_concedido', 'true');
+            document.getElementById('tela-login').style.display = 'none';
+        } else {
+            document.getElementById('erro-login').style.display = 'block';
+        }
+    }
+
+    function mostrarSenha() {
+        let input = document.getElementById('senha-input');
+        let icone = document.getElementById('icone-olho');
+        if (input.type === 'password') { input.type = 'text'; icone.src = 'OLHOABERTO.png'; } 
+        else { input.type = 'password'; icone.src = 'OLHOFECHADO_V2.png'; }
+    }
+
+    let banco = JSON.parse(localStorage.getItem('wm_registros_refeicao')) || [];
+    let indiceEdicao = -1; 
+
+    function calcularTotal() {
+        document.getElementById('total-registros').innerText = banco.length + " Refeições Registradas";
+    }
+
+    function validarCPF(cpf) {
+        cpf = cpf.replace(/[^\d]+/g, ''); 
+        if (cpf == '') return false;
+        if (cpf.length != 11 || /^(\d)\1{10}$/.test(cpf)) return false; 
+        let add = 0, rev = 0;
+        for (let i = 0; i < 9; i++) add += parseInt(cpf.charAt(i)) * (10 - i);
+        rev = 11 - (add % 11);
+        if (rev == 10 || rev == 11) rev = 0;
+        if (rev != parseInt(cpf.charAt(9))) return false;
+        add = 0;
+        for (let i = 0; i < 10; i++) add += parseInt(cpf.charAt(i)) * (11 - i);
+        rev = 11 - (add % 11);
+        if (rev == 10 || rev == 11) rev = 0;
+        if (rev != parseInt(cpf.charAt(10))) return false;
+        return true;
+    }
+
+    function verificarErroCPF() {
+        let cpfInput = document.getElementById('cpf').value;
+        if (cpfInput.replace(/\D/g, "").length >= 11) {
+            if (!validarCPF(cpfInput)) { document.getElementById('erro-cpf').style.display = 'block'; } 
+            else { document.getElementById('erro-cpf').style.display = 'none'; }
+        } else { document.getElementById('erro-cpf').style.display = 'none'; }
+    }
+
+    function verificarCondicionais() {
+        document.getElementById('div-qual-empresa').style.display = document.getElementById('empresa').value === 'Outra Empresa' ? 'block' : 'none';
+        document.getElementById('div-qual-obra').style.display = document.getElementById('obra').value === 'Outra Obra' ? 'block' : 'none';
+        document.getElementById('div-qual-restaurante').style.display = document.getElementById('restaurante').value === 'Outro Restaurante' ? 'block' : 'none';
+    }
+
+    function comprimirImagem(file) {
+        return new Promise((resolve) => {
+            if (!file) { resolve(null); return; }
+            let reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(event) {
+                let img = new Image();
+                img.src = event.target.result;
+                img.onload = function() {
+                    let canvas = document.createElement('canvas');
+                    let ctx = canvas.getContext('2d');
+                    let MAX_WIDTH = 600, MAX_HEIGHT = 600;
+                    let width = img.width, height = img.height;
+                    if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } 
+                    else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
+                    canvas.width = width; canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    resolve(canvas.toDataURL('image/jpeg', 0.6));
+                }
+            }
         });
-    });
-</script>
+    }
 
+    async function salvarRefeicao() {
+        let nome = document.getElementById('nome-completo').value;
+        let cpf = document.getElementById('cpf').value;
+        let selEmpresa = document.getElementById('empresa').value;
+        let txtEmpresa = document.getElementById('qual-empresa').value;
+        let txtFuncao = document.getElementById('funcao').value; 
+        let selObra = document.getElementById('obra').value;
+        let txtObra = document.getElementById('qual-obra').value;
+        let selRestaurante = document.getElementById('restaurante').value;
+        let txtRestaurante = document.getElementById('qual-restaurante').value;
+        let selRefeicao = document.getElementById('refeicao').value;
+        let valPreco = document.getElementById('preco').value; // Pega no formato "R$ 25,50"
+
+        let fotoLocalInput = document.getElementById('foto-local').files[0];
+        let fotoAssinaturaInput = document.getElementById('foto-assinatura').files[0];
+
+        if(!nome || !cpf) return alert("⚠️ Atenção: Preencha Nome Completo e CPF!");
+        if(!validarCPF(cpf)) { document.getElementById('erro-cpf').style.display = 'block'; return alert("❌ CPF INVÁLIDO!!! Verifique o número digitado."); }
+        if (!selEmpresa || (selEmpresa === 'Outra Empresa' && !txtEmpresa)) return alert("⚠️ Informe a Empresa!");
+        if (!txtFuncao) return alert("⚠️ Informe a Função!");
+        if (!selObra || (selObra === 'Outra Obra' && !txtObra)) return alert("⚠️ Informe a Obra!");
+        if (!selRestaurante || (selRestaurante === 'Outro Restaurante' && !txtRestaurante)) return alert("⚠️ Informe o Restaurante!");
+        if (!selRefeicao) return alert("⚠️ Selecione a Refeição!");
+        
+        if (indiceEdicao < 0 && (!fotoLocalInput || !fotoAssinaturaInput)) {
+            return alert("⚠️ Atenção: As fotos do Local e da Assinatura são obrigatórias!");
+        }
+
+        document.getElementById('btn-salvar-principal').innerText = "⏳ Salvando...";
+
+        let fLocal = await comprimirImagem(fotoLocalInput);
+        let fAssinatura = await comprimirImagem(fotoAssinaturaInput);
+
+        let dataAtual = new Date();
+        let dataFormatada = dataAtual.toLocaleDateString('pt-BR');
+        let horaFormatada = dataAtual.toLocaleTimeString('pt-BR');
+
+        let item = {
+            nome: nome, cpf: cpf,
+            empresa_sel: selEmpresa, empresa_txt: txtEmpresa,
+            funcao_txt: txtFuncao,
+            obra_sel: selObra, obra_txt: txtObra,
+            restaurante_sel: selRestaurante, restaurante_txt: txtRestaurante,
+            refeicao: selRefeicao,
+            preco: valPreco || "R$ 0,00",
+            fotoLocal: fLocal, fotoAssinatura: fAssinatura,
+            dataReg: dataFormatada, horaReg: horaFormatada
+        };
+
+        if (indiceEdicao >= 0) {
+            if (!item.fotoLocal) item.fotoLocal = banco[indiceEdicao].fotoLocal;
+            if (!item.fotoAssinatura) item.fotoAssinatura = banco[indiceEdicao].fotoAssinatura;
+            item.dataReg = banco[indiceEdicao].dataReg;
+            item.horaReg = banco[indiceEdicao].horaReg;
+            banco[indiceEdicao] = item;
+            indiceEdicao = -1; 
+        } else {
+            banco.push(item);
+        }
+
+        try {
+            localStorage.setItem('wm_registros_refeicao', JSON.stringify(banco));
+            gravarConfiguracoesSalvas(); 
+
+            if(!document.getElementById('chk-nome').checked) document.getElementById('nome-completo').value = '';
+            if(!document.getElementById('chk-cpf').checked) document.getElementById('cpf').value = '';
+            if(!document.getElementById('chk-empresa').checked) { document.getElementById('empresa').value = ''; document.getElementById('qual-empresa').value = ''; }
+            if(!document.getElementById('chk-funcao').checked) document.getElementById('funcao').value = '';
+            if(!document.getElementById('chk-obra').checked) { document.getElementById('obra').value = ''; document.getElementById('qual-obra').value = ''; }
+            if(!document.getElementById('chk-restaurante').checked) { document.getElementById('restaurante').value = ''; document.getElementById('qual-restaurante').value = ''; }
+            if(!document.getElementById('chk-refeicao').checked) document.getElementById('refeicao').value = '';
+            if(!document.getElementById('chk-preco').checked) document.getElementById('preco').value = '';
+
+            document.getElementById('foto-local').value = ''; 
+            document.getElementById('foto-assinatura').value = ''; 
+
+            document.getElementById('btn-salvar-principal').innerText = "✅ Enviar (Salvar Registro)";
+            document.getElementById('erro-cpf').style.display = 'none';
+            calcularTotal(); 
+            verificarCondicionais();
+            alert("✔️ Registro Salvo com Sucesso!");
+        } catch (e) {
+            alert("❌ Memória do celular cheia! Gere o PDF e limpe a ficha.");
+            document.getElementById('btn-salvar-principal').innerText = "✅ Enviar (Salvar Registro)";
+        }
+    }
+
+    function abrirPlanilha() {
+        document.getElementById('tela-principal').style.display = 'none';
+        document.getElementById('tela-planilha').style.display = 'block';
+
+        document.getElementById('print-total').innerText = banco.length;
+        document.getElementById('print-data-emissao').innerText = "Emitido: " + new Date().toLocaleDateString() + " às " + new Date().toLocaleTimeString();
+        document.getElementById('print-device-id').innerText = "Aparelho ID: " + getDeviceID();
+
+        let corpo = document.getElementById('corpo-tabela'); 
+        corpo.innerHTML = "";
+        let somaTotal = 0;
+
+        banco.forEach((item, index) => {
+            let fotosHTML = `<div style="display:flex; flex-direction:row; gap:5px;">`;
+            if(item.fotoLocal) fotosHTML += `<div class="anexo-box"><span class="legenda-foto">Local</span><img src="${item.fotoLocal}" class="foto-miniatura" onclick="verFoto('${item.fotoLocal}')"></div>`;
+            if(item.fotoAssinatura) fotosHTML += `<div class="anexo-box"><span class="legenda-foto">Assin.</span><img src="${item.fotoAssinatura}" class="foto-miniatura" onclick="verFoto('${item.fotoAssinatura}')"></div>`;
+            fotosHTML += `</div>`;
+
+            let displayEmpresa = item.empresa_sel === 'Outra Empresa' ? item.empresa_txt : item.empresa_sel;
+            let displayObra = item.obra_sel === 'Outra Obra' ? item.obra_txt : item.obra_sel;
+            let displayRestaurante = item.restaurante_sel === 'Outro Restaurante' ? item.restaurante_txt : item.restaurante_sel;
+            
+            // Tratamento matemático para transformar "R$ 25,50" em "25.50" para a soma
+            let valorNumerico = parseFloat(item.preco.replace('R$ ', '').replace('.', '').replace(',', '.')) || 0;
+            somaTotal += valorNumerico;
+
+            corpo.innerHTML += `<tr>
+                <td>${item.dataReg}</td>
+                <td><b>${item.horaReg}</b></td>
+                <td><b>${item.nome}</b><br><span style="color:#555; font-size:10px;">CPF: ${item.cpf}</span></td>
+                <td>${displayEmpresa}<br><span style="color:#555; font-size:10px;">${item.funcao_txt}</span></td>
+                <td>${displayObra}<br><span style="color:#f39c12; font-size:10px;"><b>${displayRestaurante}</b></span></td>
+                <td><b>${item.refeicao}</b></td>
+                <td style="color:green; font-weight:bold; white-space:nowrap;">${item.preco}</td>
+                <td>${fotosHTML}</td>
+                <td style="text-align:center;">
+                    <button onclick="editar(${index})" style="background:orange; color:white; border:none; padding:8px; border-radius:3px; cursor:pointer; margin-bottom:5px; width: 100%;">✏️ Editar</button>
+                    <button onclick="excluir(${index})" style="background:red; color:white; border:none; padding:8px; border-radius:3px; cursor:pointer; width: 100%;">🗑️ Excluir</button>
+                </td>
+            </tr>`;
+        });
+        
+        // Formata o total de volta para o padrão brasileiro
+        let totalFormatado = somaTotal.toFixed(2).replace('.', ',');
+        document.getElementById('print-valor-total').innerText = "R$ " + totalFormatado.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+    }
+
+    function voltarParaFormulario() { document.getElementById('tela-planilha').style.display = 'none'; document.getElementById('tela-principal').style.display = 'block'; }
+    function verFoto(src) { document.getElementById('foto-ampliada').src = src; document.getElementById('modal-foto').style.display = 'flex'; }
+
+    function editar(index) {
+        let it = banco[index];
+        document.getElementById('nome-completo').value = it.nome;
+        document.getElementById('cpf').value = it.cpf;
+        
+        document.getElementById('empresa').value = it.empresa_sel;
+        document.getElementById('qual-empresa').value = it.empresa_txt || '';
+        
+        document.getElementById('funcao').value = it.funcao_txt || '';
+        
+        document.getElementById('obra').value = it.obra_sel;
+        document.getElementById('qual-obra').value = it.obra_txt || '';
+
+        document.getElementById('restaurante').value = it.restaurante_sel || '';
+        document.getElementById('qual-restaurante').value = it.restaurante_txt || '';
+        
+        document.getElementById('refeicao').value = it.refeicao;
+        document.getElementById('preco').value = it.preco !== "R$ 0,00" ? it.preco : '';
+
+        verificarCondicionais();
+        document.getElementById('erro-cpf').style.display = 'none';
+
+        indiceEdicao = index;
+        document.getElementById('btn-salvar-principal').innerText = "💾 Atualizar Registro";
+        voltarParaFormulario();
+    }
+
+    function excluir(index) { if(confirm("Excluir definitivamente?")) { banco.splice(index,1); localStorage.setItem('wm_registros_refeicao', JSON.stringify(banco)); abrirPlanilha(); calcularTotal(); } }
+
+    function gerarPDF() { abrirPlanilha(); setTimeout(() => { window.print(); }, 1500); }
+
+    function encerrarRelatorio() { 
+        if(confirm("Apagar toda a ficha do aparelho? Faça isso apenas DEPOIS de gerar e enviar o PDF!")) { 
+            localStorage.removeItem('wm_registros_refeicao');
+            window.location.reload();
+        } 
+    }
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Service Worker registrado com sucesso!'))
+                .catch(err => console.log('Erro ao registrar Service Worker:', err));
+        });
+    }
+</script>
 </body>
 </html>
