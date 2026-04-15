@@ -239,22 +239,36 @@
                 <input type="text" id="qual-restaurante" placeholder="Digite o nome do restaurante">
             </div>
 
-            <div class="label-linha">
-                <label>Refeição: <span style="color:red">*</span></label>
-                <label class="chk-pequeno"><input type="checkbox" id="chk-refeicao"> ✅ Salvar</label>
+            <div style="background: #e2e8f0; padding: 10px; border-radius: 5px; border: 1px solid #cbd5e1; margin-top: 5px;">
+                <div class="label-linha" style="margin-top: 0;">
+                    <label>Tabela de Preços (R$):</label>
+                    <label class="chk-pequeno"><input type="checkbox" id="chk-precos"> ✅ Salvar Preços</label>
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 5px;">
+                    <div style="flex: 1;">
+                        <label style="font-size: 10px; color: #555;">Café</label>
+                        <input type="text" id="preco-cafe" placeholder="0,00" oninput="mascaraMoeda(this)" style="padding: 8px; font-size: 12px;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 10px; color: #555;">Almoço</label>
+                        <input type="text" id="preco-almoco" placeholder="0,00" oninput="mascaraMoeda(this)" style="padding: 8px; font-size: 12px;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 10px; color: #555;">Jantar</label>
+                        <input type="text" id="preco-jantar" placeholder="0,00" oninput="mascaraMoeda(this)" style="padding: 8px; font-size: 12px;">
+                    </div>
+                </div>
             </div>
-            <select id="refeicao">
-                <option value="" disabled selected>--- Selecione na lista suspensa ---</option>
+
+            <div class="label-linha">
+                <label>Selecione a Refeição Atendida: <span style="color:red">*</span></label>
+            </div>
+            <select id="refeicao" style="border: 2px solid var(--laranja-wm); font-weight: bold;">
+                <option value="" disabled selected>--- Selecione a Refeição ---</option>
                 <option value="Café da manhã">Café da manhã</option>
                 <option value="Almoço">Almoço</option>
                 <option value="Jantar">Jantar</option>
             </select>
-
-            <div class="label-linha">
-                <label>Preço Cobrado (R$):</label>
-                <label class="chk-pequeno"><input type="checkbox" id="chk-preco"> ✅ Salvar</label>
-            </div>
-            <input type="text" id="preco" placeholder="R$ 0,00" oninput="mascaraMoeda(this)">
 
             <div style="background: #fdf5e6; padding: 10px; border-radius: 5px; border: 1px solid #f39c12; margin-top: 10px;">
                 <label>📸 Foto do Local (obrigatório): <span style="color:red">*</span></label>
@@ -271,7 +285,7 @@
         <div class="area-acoes">
             <button class="btn-pausar" onclick="alert('✅ Os dados estão salvos no seu celular.')">💾 Salvar Rascunho</button>
             <button class="btn-whats" onclick="gerarPDF()">📲 GERAR RELATÓRIO PDF</button>
-            <button class="btn-encerrar" onclick="encerrarRelatorio()">🏁 Limpar Ficha e Iniciar Nova</button>
+            <button class="btn-encerrar" onclick="encerrarRelatorio()">🏁 ENCERRAR O APP REFEIÇÃO CONTROLADORIA E ATUALIZAR</button>
         </div>
     </div>
 
@@ -298,8 +312,7 @@
             <table id="tabela-dados">
                 <thead>
                     <tr>
-                        <th>Data</th>
-                        <th>Hora</th>
+                        <th>Data / Hora</th>
                         <th>Colaborador / CPF</th>
                         <th>Empresa / Função</th>
                         <th>Obra / Restaurante</th>
@@ -342,7 +355,6 @@
         return id;
     }
 
-    // Máscara de CPF automática (Exigência: . e -)
     function mascaraCPF(i){
         var v = i.value.replace(/\D/g, "");
         i.setAttribute("maxlength", "14");
@@ -354,7 +366,6 @@
         }
     }
 
-    // Máscara de Moeda (Ex: R$ 25,50)
     function mascaraMoeda(i) {
         let v = i.value.replace(/\D/g, "");
         if (v === "") {
@@ -370,7 +381,7 @@
     function carregarConfiguracoesSalvas() {
         let configs = JSON.parse(localStorage.getItem('wm_campos_salvos')) || {};
         
-        ['nome', 'cpf', 'empresa', 'funcao', 'obra', 'restaurante', 'refeicao', 'preco'].forEach(campo => {
+        ['nome', 'cpf', 'empresa', 'funcao', 'obra', 'restaurante'].forEach(campo => {
             if (configs[campo] && configs[campo].salvar) {
                 document.getElementById('chk-' + campo).checked = true;
                 
@@ -388,6 +399,14 @@
                 }
             }
         });
+
+        if (configs.precos && configs.precos.salvar) {
+            document.getElementById('chk-precos').checked = true;
+            document.getElementById('preco-cafe').value = configs.precos.cafe || '';
+            document.getElementById('preco-almoco').value = configs.precos.almoco || '';
+            document.getElementById('preco-jantar').value = configs.precos.jantar || '';
+        }
+
         verificarCondicionais();
     }
 
@@ -404,8 +423,13 @@
         configs.funcao = { salvar: document.getElementById('chk-funcao').checked, valor: document.getElementById('funcao').value };
         configs.obra = { salvar: document.getElementById('chk-obra').checked, valor: selObra, txt: (selObra === 'Outra Obra' ? document.getElementById('qual-obra').value : '') };
         configs.restaurante = { salvar: document.getElementById('chk-restaurante').checked, valor: selRestaurante, txt: (selRestaurante === 'Outro Restaurante' ? document.getElementById('qual-restaurante').value : '') };
-        configs.refeicao = { salvar: document.getElementById('chk-refeicao').checked, valor: document.getElementById('refeicao').value };
-        configs.preco = { salvar: document.getElementById('chk-preco').checked, valor: document.getElementById('preco').value };
+        
+        configs.precos = { 
+            salvar: document.getElementById('chk-precos').checked, 
+            cafe: document.getElementById('preco-cafe').value,
+            almoco: document.getElementById('preco-almoco').value,
+            jantar: document.getElementById('preco-jantar').value
+        };
 
         localStorage.setItem('wm_campos_salvos', JSON.stringify(configs));
     }
@@ -508,7 +532,12 @@
         let selRestaurante = document.getElementById('restaurante').value;
         let txtRestaurante = document.getElementById('qual-restaurante').value;
         let selRefeicao = document.getElementById('refeicao').value;
-        let valPreco = document.getElementById('preco').value; // Pega no formato "R$ 25,50"
+
+        // Pega o valor correspondente à refeição selecionada
+        let valPreco = "R$ 0,00";
+        if (selRefeicao === "Café da manhã") valPreco = document.getElementById('preco-cafe').value || "R$ 0,00";
+        if (selRefeicao === "Almoço") valPreco = document.getElementById('preco-almoco').value || "R$ 0,00";
+        if (selRefeicao === "Jantar") valPreco = document.getElementById('preco-jantar').value || "R$ 0,00";
 
         let fotoLocalInput = document.getElementById('foto-local').files[0];
         let fotoAssinaturaInput = document.getElementById('foto-assinatura').files[0];
@@ -519,7 +548,7 @@
         if (!txtFuncao) return alert("⚠️ Informe a Função!");
         if (!selObra || (selObra === 'Outra Obra' && !txtObra)) return alert("⚠️ Informe a Obra!");
         if (!selRestaurante || (selRestaurante === 'Outro Restaurante' && !txtRestaurante)) return alert("⚠️ Informe o Restaurante!");
-        if (!selRefeicao) return alert("⚠️ Selecione a Refeição!");
+        if (!selRefeicao) return alert("⚠️ Selecione a Refeição Atendida!");
         
         if (indiceEdicao < 0 && (!fotoLocalInput || !fotoAssinaturaInput)) {
             return alert("⚠️ Atenção: As fotos do Local e da Assinatura são obrigatórias!");
@@ -541,7 +570,7 @@
             obra_sel: selObra, obra_txt: txtObra,
             restaurante_sel: selRestaurante, restaurante_txt: txtRestaurante,
             refeicao: selRefeicao,
-            preco: valPreco || "R$ 0,00",
+            preco: valPreco,
             fotoLocal: fLocal, fotoAssinatura: fAssinatura,
             dataReg: dataFormatada, horaReg: horaFormatada
         };
@@ -561,14 +590,16 @@
             localStorage.setItem('wm_registros_refeicao', JSON.stringify(banco));
             gravarConfiguracoesSalvas(); 
 
+            // Limpa os campos não salvos
             if(!document.getElementById('chk-nome').checked) document.getElementById('nome-completo').value = '';
             if(!document.getElementById('chk-cpf').checked) document.getElementById('cpf').value = '';
             if(!document.getElementById('chk-empresa').checked) { document.getElementById('empresa').value = ''; document.getElementById('qual-empresa').value = ''; }
             if(!document.getElementById('chk-funcao').checked) document.getElementById('funcao').value = '';
             if(!document.getElementById('chk-obra').checked) { document.getElementById('obra').value = ''; document.getElementById('qual-obra').value = ''; }
             if(!document.getElementById('chk-restaurante').checked) { document.getElementById('restaurante').value = ''; document.getElementById('qual-restaurante').value = ''; }
-            if(!document.getElementById('chk-refeicao').checked) document.getElementById('refeicao').value = '';
-            if(!document.getElementById('chk-preco').checked) document.getElementById('preco').value = '';
+            
+            // Sempre zera a seleção de refeição para a próxima pessoa
+            document.getElementById('refeicao').value = '';
 
             document.getElementById('foto-local').value = ''; 
             document.getElementById('foto-assinatura').value = ''; 
@@ -606,13 +637,12 @@
             let displayObra = item.obra_sel === 'Outra Obra' ? item.obra_txt : item.obra_sel;
             let displayRestaurante = item.restaurante_sel === 'Outro Restaurante' ? item.restaurante_txt : item.restaurante_sel;
             
-            // Tratamento matemático para transformar "R$ 25,50" em "25.50" para a soma
+            // Soma os preços
             let valorNumerico = parseFloat(item.preco.replace('R$ ', '').replace('.', '').replace(',', '.')) || 0;
             somaTotal += valorNumerico;
 
             corpo.innerHTML += `<tr>
-                <td>${item.dataReg}</td>
-                <td><b>${item.horaReg}</b></td>
+                <td>${item.dataReg}<br><b>${item.horaReg}</b></td>
                 <td><b>${item.nome}</b><br><span style="color:#555; font-size:10px;">CPF: ${item.cpf}</span></td>
                 <td>${displayEmpresa}<br><span style="color:#555; font-size:10px;">${item.funcao_txt}</span></td>
                 <td>${displayObra}<br><span style="color:#f39c12; font-size:10px;"><b>${displayRestaurante}</b></span></td>
@@ -626,7 +656,6 @@
             </tr>`;
         });
         
-        // Formata o total de volta para o padrão brasileiro
         let totalFormatado = somaTotal.toFixed(2).replace('.', ',');
         document.getElementById('print-valor-total').innerText = "R$ " + totalFormatado.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
     }
@@ -651,7 +680,8 @@
         document.getElementById('qual-restaurante').value = it.restaurante_txt || '';
         
         document.getElementById('refeicao').value = it.refeicao;
-        document.getElementById('preco').value = it.preco !== "R$ 0,00" ? it.preco : '';
+
+        // Na edição, não sobrepomos a tabela de preços. Como o preço já foi puxado e salvo na "item.preco", a tabela global fica intacta.
 
         verificarCondicionais();
         document.getElementById('erro-cpf').style.display = 'none';
@@ -665,7 +695,7 @@
 
     function gerarPDF() { abrirPlanilha(); setTimeout(() => { window.print(); }, 1500); }
 
-    // ====== ROTINA DE LIMPEZA E ATUALIZAÇÃO ROBUSTA (Idêntica ao Caixinha) ======
+    // ROTINA ROBUSTA DE LIMPEZA DO APP
     function encerrarRelatorio() { 
         if(confirm("Apagar toda a ficha do aparelho? Faça isso apenas DEPOIS de gerar e enviar o PDF!")) { 
             localStorage.removeItem('wm_registros_refeicao');
