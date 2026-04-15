@@ -1,14 +1,11 @@
-// Mudamos para v2 para obrigar o celular a baixar o novo index.html
-const CACHE_NAME = 'awm-refeicoes-v2';
+const CACHE_NAME = 'awm-refeicoes-v3';
 
-// Lista de arquivos que o celular precisa salvar para rodar offline
+// Lista exata de arquivos baseada no seu repositório
 const urlsToCache = [
   './',
   './index.html', 
   './manifest.json',
-  './icone_v3.png',
   './LOGOTIPO.jpg',
-  // Os espaços foram trocados por %20 para evitar erro de download no Service Worker
   './Captura%20de%20tela%202026-02-13%20132630.jpg',
   './OLHOFECHADO_V2.png',
   './OLHOABERTO.png'
@@ -16,18 +13,16 @@ const urlsToCache = [
 
 // Instalação: Salva tudo no Cache
 self.addEventListener('install', event => {
-  // O skipWaiting faz o novo cache assumir imediatamente, sem precisar fechar o app
   self.skipWaiting(); 
-  
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      console.log('Arquivos em cache salvos com sucesso!');
+      console.log('Arquivos em cache salvos com sucesso (v3)!');
       return cache.addAll(urlsToCache);
     })
   );
 });
 
-// Ativação: Limpa caches antigos se você atualizar a versão
+// Ativação: Limpa os caches antigos (v1, v2)
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -41,11 +36,10 @@ self.addEventListener('activate', event => {
       );
     })
   );
-  // Garante que a página atual já use o novo Service Worker
   return self.clients.claim();
 });
 
-// Interceptador: Tenta pegar da rede primeiro (para ter sempre o mais atual), se cair a internet, pega do cache offline
+// Interceptador: Tenta a rede, se cair, vai pro offline
 self.addEventListener('fetch', event => {
   event.respondWith(
     fetch(event.request).catch(() => {
