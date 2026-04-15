@@ -2,7 +2,7 @@
   "name": "AWM Refeições",
   "short_name": "Refeições",
   "description": "Controle de Refeições AWM",
-  "start_url": "./",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f4f7f6",
   "theme_color": "#1a233a",
