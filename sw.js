@@ -1,46 +1,43 @@
-const CACHE_NAME = 'awm-refeicoes-v4';
+const CACHE_NAME = 'awm-refeicoes-v2';
 
-// Lista exata de arquivos baseada no seu repositório do GitHub
 const urlsToCache = [
   './',
-  './index.html',
+  './index.html', 
   './manifest.json',
+  './icone_v3.png',
   './LOGOTIPO.jpg',
-  './Captura%20de%20tela%202026-02-13%20132630.jpg',
-  './OLHOABERTO.png',
-  './OLHOFECHADO_V2.png'
+  './Captura de tela 2026-02-13 132630.jpg',
+  './OLHOFECHADO_V2.png',
+  './OLHOABERTO.png'
 ];
 
-// Instalação: Salva tudo no Cache
 self.addEventListener('install', event => {
-  self.skipWaiting(); 
+  self.skipWaiting(); // Força a instalação imediata da nova versão
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      console.log('Arquivos em cache salvos com sucesso (v4)!');
+      console.log('Arquivos em cache salvos com sucesso!');
       return cache.addAll(urlsToCache);
     })
   );
 });
 
-// Ativação: Limpa os caches antigos (v1, v2, v3)
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheName !== CACHE_NAME) {
-            console.log('Apagando cache antigo:', cacheName);
+            console.log('Limpando cache antigo:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
-    })
+    }).then(() => self.clients.claim()) // Força o controle imediato
   );
-  return self.clients.claim();
 });
 
-// Interceptador: Tenta a rede primeiro, se cair a internet, puxa do cache offline
 self.addEventListener('fetch', event => {
+  // Estratégia: Tenta a rede primeiro (para ter sempre o mais atual). Se falhar (offline), usa o cache.
   event.respondWith(
     fetch(event.request).catch(() => {
       return caches.match(event.request);
