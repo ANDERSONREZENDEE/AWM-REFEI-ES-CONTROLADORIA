@@ -35,6 +35,7 @@
 
         input, select, textarea {
             box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; width: 100%; padding: 10px; margin-top: 3px;
+            -webkit-user-select: auto; -moz-user-select: auto; -ms-user-select: auto; user-select: auto;
         }
 
         .app-container { width: 100%; max-width: 700px; background-color: var(--fundo); min-height: 95vh; border: 8px solid; border-image: linear-gradient(to right, var(--azul-wm) 50%, var(--laranja-wm) 50%) 1; box-shadow: 0 5px 15px rgba(0,0,0,0.3); box-sizing: border-box; position: relative; }
@@ -664,18 +665,50 @@
 
     function gerarPDF() { abrirPlanilha(); setTimeout(() => { window.print(); }, 1500); }
 
+    // ====== ROTINA DE LIMPEZA E ATUALIZAÇÃO ROBUSTA (Idêntica ao Caixinha) ======
     function encerrarRelatorio() { 
         if(confirm("Apagar toda a ficha do aparelho? Faça isso apenas DEPOIS de gerar e enviar o PDF!")) { 
             localStorage.removeItem('wm_registros_refeicao');
-            window.location.reload();
+            localStorage.removeItem('wm_campos_salvos'); 
+            
+            if ('serviceWorker' in navigator) {
+                caches.keys().then(function(names) {
+                    for (let name of names) caches.delete(name);
+                });
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for(let registration of registrations) {
+                        registration.unregister();
+                    }
+                });
+            }
+            window.location.href = window.location.pathname + '?atualizar=' + new Date().getTime();
         } 
     }
 
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('Service Worker registrado com sucesso!'))
-                .catch(err => console.log('Erro ao registrar Service Worker:', err));
+        navigator.serviceWorker.register('./sw.js').then(reg => {
+            reg.update(); 
+            reg.onupdatefound = () => {
+                const novoWorker = reg.installing;
+                novoWorker.onstatechange = () => {
+                    if (novoWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        console.log("Nova versão detectada! Atualizando app silenciosamente...");
+                        caches.keys().then(keys => {
+                            Promise.all(keys.map(key => caches.delete(key))).then(() => {
+                                window.location.reload(true);
+                            });
+                        });
+                    }
+                };
+            };
+        }).catch(err => {
+            console.log("Erro no Service Worker:", err);
+        });
+        
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") {
+                navigator.serviceWorker.ready.then(reg => reg.update());
+            }
         });
     }
 </script>
