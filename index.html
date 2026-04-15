@@ -51,7 +51,6 @@
 
         .formulario { display: flex; flex-direction: column; gap: 8px; }
         
-        /* Layout flexível para Labels com Caixinhas de Salvar */
         .label-linha { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 8px; }
         label { font-size: 12px; font-weight: bold; color: #555; }
         .chk-pequeno { font-size: 10px; color: #333; display: flex; align-items: center; gap: 4px; font-weight: normal; cursor: pointer; background: #e2e8f0; padding: 3px 6px; border-radius: 4px; border: 1px solid #cbd5e1; }
@@ -103,7 +102,6 @@
         #modal-foto { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; }
         #foto-ampliada { max-width: 90%; max-height: 80%; border: 3px solid white; pointer-events: none; }
 
-        /* ESTILOS DA TELA DE LOGIN */
         #tela-login {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--azul-wm); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
@@ -255,7 +253,7 @@
                 <label>Preço Cobrado (R$):</label>
                 <label class="chk-pequeno"><input type="checkbox" id="chk-preco"> ✅ Salvar</label>
             </div>
-            <input type="number" id="preco" step="0.01" placeholder="Ex: 25.50">
+            <input type="text" id="preco" placeholder="R$ 0,00" oninput="mascaraMoeda(this)">
 
             <div style="background: #fdf5e6; padding: 10px; border-radius: 5px; border: 1px solid #f39c12; margin-top: 10px;">
                 <label>📸 Foto do Local (obrigatório): <span style="color:red">*</span></label>
@@ -291,7 +289,7 @@
             </div>
             <div style="text-align: center; margin-top: 10px; font-weight: bold;">
                 TOTAL DE REFEIÇÕES: <span id="print-total" style="color: red; font-size: 14px;">0</span> | 
-                VALOR TOTAL: <span id="print-valor-total" style="color: green; font-size: 14px;">R$ 0.00</span>
+                VALOR TOTAL: <span id="print-valor-total" style="color: green; font-size: 14px;">R$ 0,00</span>
             </div>
         </div>
 
@@ -299,7 +297,8 @@
             <table id="tabela-dados">
                 <thead>
                     <tr>
-                        <th>Data e Hora</th>
+                        <th>Data</th>
+                        <th>Hora</th>
                         <th>Colaborador / CPF</th>
                         <th>Empresa / Função</th>
                         <th>Obra / Restaurante</th>
@@ -333,7 +332,6 @@
         carregarConfiguracoesSalvas(); 
     };
 
-    // Gera um ID de dispositivo único se não existir (substituto do IMEI)
     function getDeviceID() {
         let id = localStorage.getItem('wm_device_id');
         if (!id) {
@@ -343,9 +341,9 @@
         return id;
     }
 
-    // Máscara de CPF automática (Exigência do usuário: . e -)
+    // Máscara de CPF automática (Exigência: . e -)
     function mascaraCPF(i){
-        var v = i.value.replace(/\D/g, ""); // remove tudo que não for número
+        var v = i.value.replace(/\D/g, "");
         i.setAttribute("maxlength", "14");
         if (v.length <= 11) {
             v = v.replace(/(\d{3})(\d)/, "$1.$2");
@@ -355,7 +353,19 @@
         }
     }
 
-    // Nova Lógica de Carregar Dados Independentes
+    // Máscara de Moeda (Ex: R$ 25,50)
+    function mascaraMoeda(i) {
+        let v = i.value.replace(/\D/g, "");
+        if (v === "") {
+            i.value = "";
+            return;
+        }
+        v = (v / 100).toFixed(2) + "";
+        v = v.replace(".", ",");
+        v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+        i.value = "R$ " + v;
+    }
+
     function carregarConfiguracoesSalvas() {
         let configs = JSON.parse(localStorage.getItem('wm_campos_salvos')) || {};
         
@@ -363,7 +373,6 @@
             if (configs[campo] && configs[campo].salvar) {
                 document.getElementById('chk-' + campo).checked = true;
                 
-                // Tratar os campos compostos (selects e inputs)
                 if(campo === 'empresa' && configs.empresa.txt) {
                     document.getElementById('empresa').value = 'Outra Empresa';
                     document.getElementById('qual-empresa').value = configs.empresa.txt;
@@ -381,7 +390,6 @@
         verificarCondicionais();
     }
 
-    // Salvar as configurações dos checkboxes marcados
     function gravarConfiguracoesSalvas() {
         let configs = {};
         
@@ -435,7 +443,7 @@
     }
 
     function validarCPF(cpf) {
-        cpf = cpf.replace(/[^\d]+/g, ''); // Limpa pontos e traços para validar matematicamente
+        cpf = cpf.replace(/[^\d]+/g, ''); 
         if (cpf == '') return false;
         if (cpf.length != 11 || /^(\d)\1{10}$/.test(cpf)) return false; 
         let add = 0, rev = 0;
@@ -491,25 +499,19 @@
     async function salvarRefeicao() {
         let nome = document.getElementById('nome-completo').value;
         let cpf = document.getElementById('cpf').value;
-
         let selEmpresa = document.getElementById('empresa').value;
         let txtEmpresa = document.getElementById('qual-empresa').value;
-
-        let txtFuncao = document.getElementById('funcao').value; // Agora pega direto do input/datalist
-
+        let txtFuncao = document.getElementById('funcao').value; 
         let selObra = document.getElementById('obra').value;
         let txtObra = document.getElementById('qual-obra').value;
-
         let selRestaurante = document.getElementById('restaurante').value;
         let txtRestaurante = document.getElementById('qual-restaurante').value;
-
         let selRefeicao = document.getElementById('refeicao').value;
-        let valPreco = document.getElementById('preco').value;
+        let valPreco = document.getElementById('preco').value; // Pega no formato "R$ 25,50"
 
         let fotoLocalInput = document.getElementById('foto-local').files[0];
         let fotoAssinaturaInput = document.getElementById('foto-assinatura').files[0];
 
-        // Validações
         if(!nome || !cpf) return alert("⚠️ Atenção: Preencha Nome Completo e CPF!");
         if(!validarCPF(cpf)) { document.getElementById('erro-cpf').style.display = 'block'; return alert("❌ CPF INVÁLIDO!!! Verifique o número digitado."); }
         if (!selEmpresa || (selEmpresa === 'Outra Empresa' && !txtEmpresa)) return alert("⚠️ Informe a Empresa!");
@@ -534,11 +536,11 @@
         let item = {
             nome: nome, cpf: cpf,
             empresa_sel: selEmpresa, empresa_txt: txtEmpresa,
-            funcao_txt: txtFuncao, // Salva o texto digitado ou escolhido da lista
+            funcao_txt: txtFuncao,
             obra_sel: selObra, obra_txt: txtObra,
             restaurante_sel: selRestaurante, restaurante_txt: txtRestaurante,
             refeicao: selRefeicao,
-            preco: valPreco ? parseFloat(valPreco).toFixed(2) : "0.00",
+            preco: valPreco || "R$ 0,00",
             fotoLocal: fLocal, fotoAssinatura: fAssinatura,
             dataReg: dataFormatada, horaReg: horaFormatada
         };
@@ -556,9 +558,8 @@
 
         try {
             localStorage.setItem('wm_registros_refeicao', JSON.stringify(banco));
-            gravarConfiguracoesSalvas(); // Grava as preferências dos checkboxes
+            gravarConfiguracoesSalvas(); 
 
-            // Limpa os campos que NÃO estão marcados para salvar
             if(!document.getElementById('chk-nome').checked) document.getElementById('nome-completo').value = '';
             if(!document.getElementById('chk-cpf').checked) document.getElementById('cpf').value = '';
             if(!document.getElementById('chk-empresa').checked) { document.getElementById('empresa').value = ''; document.getElementById('qual-empresa').value = ''; }
@@ -604,15 +605,18 @@
             let displayObra = item.obra_sel === 'Outra Obra' ? item.obra_txt : item.obra_sel;
             let displayRestaurante = item.restaurante_sel === 'Outro Restaurante' ? item.restaurante_txt : item.restaurante_sel;
             
-            somaTotal += parseFloat(item.preco || 0);
+            // Tratamento matemático para transformar "R$ 25,50" em "25.50" para a soma
+            let valorNumerico = parseFloat(item.preco.replace('R$ ', '').replace('.', '').replace(',', '.')) || 0;
+            somaTotal += valorNumerico;
 
             corpo.innerHTML += `<tr>
-                <td style="white-space: nowrap;">${item.dataReg} - <b>${item.horaReg}</b></td>
+                <td>${item.dataReg}</td>
+                <td><b>${item.horaReg}</b></td>
                 <td><b>${item.nome}</b><br><span style="color:#555; font-size:10px;">CPF: ${item.cpf}</span></td>
                 <td>${displayEmpresa}<br><span style="color:#555; font-size:10px;">${item.funcao_txt}</span></td>
                 <td>${displayObra}<br><span style="color:#f39c12; font-size:10px;"><b>${displayRestaurante}</b></span></td>
                 <td><b>${item.refeicao}</b></td>
-                <td><b>R$ ${item.preco}</b></td>
+                <td style="color:green; font-weight:bold; white-space:nowrap;">${item.preco}</td>
                 <td>${fotosHTML}</td>
                 <td style="text-align:center;">
                     <button onclick="editar(${index})" style="background:orange; color:white; border:none; padding:8px; border-radius:3px; cursor:pointer; margin-bottom:5px; width: 100%;">✏️ Editar</button>
@@ -621,7 +625,9 @@
             </tr>`;
         });
         
-        document.getElementById('print-valor-total').innerText = "R$ " + somaTotal.toFixed(2);
+        // Formata o total de volta para o padrão brasileiro
+        let totalFormatado = somaTotal.toFixed(2).replace('.', ',');
+        document.getElementById('print-valor-total').innerText = "R$ " + totalFormatado.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
     }
 
     function voltarParaFormulario() { document.getElementById('tela-planilha').style.display = 'none'; document.getElementById('tela-principal').style.display = 'block'; }
@@ -644,7 +650,7 @@
         document.getElementById('qual-restaurante').value = it.restaurante_txt || '';
         
         document.getElementById('refeicao').value = it.refeicao;
-        document.getElementById('preco').value = it.preco !== "0.00" ? it.preco : '';
+        document.getElementById('preco').value = it.preco !== "R$ 0,00" ? it.preco : '';
 
         verificarCondicionais();
         document.getElementById('erro-cpf').style.display = 'none';
