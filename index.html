@@ -698,9 +698,14 @@
     // ROTINA ROBUSTA DE LIMPEZA DO APP
     function encerrarRelatorio() { 
         if(confirm("Apagar toda a ficha do aparelho? Faça isso apenas DEPOIS de gerar e enviar o PDF!")) { 
+            // 1. Apaga os registros de refeição e campos salvos
             localStorage.removeItem('wm_registros_refeicao');
             localStorage.removeItem('wm_campos_salvos'); 
             
+            // 2. A LINHA MÁGICA QUE FALTAVA: Apaga a permissão da senha!
+            localStorage.removeItem('acesso_refeicoes_concedido');
+            
+            // 3. Limpa a memória Cache
             if ('serviceWorker' in navigator) {
                 caches.keys().then(function(names) {
                     for (let name of names) caches.delete(name);
@@ -711,6 +716,8 @@
                     }
                 });
             }
+            
+            // 4. Recarrega a página
             window.location.href = window.location.pathname + '?atualizar=' + new Date().getTime();
         } 
     }
