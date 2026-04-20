@@ -1,4 +1,4 @@
-const CACHE_NAME = 'awm-refeicoes-v2';
+const CACHE_NAME = 'awm-refeicoes-v3'; // Atualizado para v3 para forçar a limpeza do cache velho
 
 const urlsToCache = [
   './',
@@ -36,11 +36,10 @@ self.addEventListener('activate', event => {
   );
 });
 
-self.addEventListener('fetch', event => {
-  // Estratégia: Tenta a rede primeiro (para ter sempre o mais atual). Se falhar (offline), usa o cache.
-  event.respondWith(
-    fetch(event.request).catch(() => {
-      return caches.match(event.request);
-    })
+self.addEventListener('fetch', evento => {
+  evento.respondWith(
+    // A MÁGICA OFFLINE AQUI: Estratégia Cache-First com ignoreSearch (Copiado do Caixinha)
+    caches.match(evento.request, { ignoreSearch: true })
+      .then(resposta => resposta || fetch(evento.request))
   );
 });
