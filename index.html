@@ -338,10 +338,9 @@
     const HASH_SENHA_MESTRA = String.fromCharCode(..._s);
 
     window.onload = function() {
-        const autorizado = localStorage.getItem('acesso_refeicoes_concedido');
-        if (autorizado === 'true') {
-            document.getElementById('tela-login').style.display = 'none';
-        }
+        // A TELA DE LOGIN AGORA SEMPRE APARECE
+        document.getElementById('tela-login').style.display = 'flex';
+        
         calcularTotal();
         carregarConfiguracoesSalvas(); 
     };
@@ -446,8 +445,10 @@
         const senhaDigitada = document.getElementById('senha-input').value;
         const hashDigitado = await gerarHash(senhaDigitada);
         if (hashDigitado === HASH_SENHA_MESTRA) {
-            localStorage.setItem('acesso_refeicoes_concedido', 'true');
+            // Removida a permissão gravada - agora toda vez vai pedir
             document.getElementById('tela-login').style.display = 'none';
+            document.getElementById('senha-input').value = ''; // Zera a senha
+            document.getElementById('erro-login').style.display = 'none'; // Tira o aviso de erro, se houver
         } else {
             document.getElementById('erro-login').style.display = 'block';
         }
@@ -702,7 +703,7 @@
             localStorage.removeItem('wm_registros_refeicao');
             localStorage.removeItem('wm_campos_salvos'); 
             
-            // 2. A LINHA MÁGICA QUE FALTAVA: Apaga a permissão da senha!
+            // 2. Apaga a permissão da senha
             localStorage.removeItem('acesso_refeicoes_concedido');
             
             // 3. Limpa a memória Cache
