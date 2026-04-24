@@ -372,7 +372,6 @@
     // INICIALIZAÇÃO ROBUSTA E SESSÃO ISOLADA
     // ==========================================
     function inicializarAppOffline() {
-        // Usando chave ESPECÍFICA de Refeições para não dar conflito com o Caixinha
         if (localStorage.getItem('wm_refeicoes_sessao_ativa') === 'true') {
             document.getElementById('tela-login').style.display = 'none';
             if (document.getElementById('tela-planilha').style.display !== 'block') {
@@ -652,16 +651,13 @@
         let dataVerificacao = (indiceEdicao >= 0) ? banco[indiceEdicao].dataReg : dataFormatada;
         
         let registroDuplicado = banco.some((item, index) => {
-            // Ignora o item atual caso esteja editando
             if (indiceEdicao >= 0 && index === indiceEdicao) return false;
-            
             return item.cpf === cpf && item.dataReg === dataVerificacao && item.refeicao === selRefeicao;
         });
 
         if (registroDuplicado) {
             return alert(`⛔ BLOQUEADO: O CPF ${cpf} já registrou "${selRefeicao}" no dia ${dataVerificacao}!\n\nNão é permitido registrar a mesma refeição mais de uma vez no mesmo dia para o mesmo colaborador.`);
         }
-        // ==========================================
 
         document.getElementById('btn-salvar-principal').innerText = "⏳ Salvando...";
 
@@ -858,7 +854,7 @@
                     console.error("Erro ao limpar o cache isolado:", e);
                 }
             }
-            window.location.href = window.location.pathname + '?atualizar=' + new Date().getTime();
+            window.location.reload();
         }
     }
 
