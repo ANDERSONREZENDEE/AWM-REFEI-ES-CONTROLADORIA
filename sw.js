@@ -1,5 +1,5 @@
-const PREFIXO_CACHE = 'caixinha-wm-';
-const CACHE_NAME = PREFIXO_CACHE + 'v7'; 
+const PREFIXO_CACHE = 'refeicoes-wm-';
+const CACHE_NAME = PREFIXO_CACHE + 'v4'; 
 
 // Arquivos principais para guardar offline imediatamente
 const arquivosParaGuardar = [
@@ -27,7 +27,7 @@ self.addEventListener('activate', evento => {
     caches.keys().then(nomesCaches => {
       return Promise.all(
         nomesCaches.map(nomeCache => {
-          // Só apaga se pertencer ao Caixinha E for uma versão velha
+          // Só apaga se pertencer ao App de Refeições E for uma versão velha
           if (nomeCache.startsWith(PREFIXO_CACHE) && nomeCache !== CACHE_NAME) {
             return caches.delete(nomeCache);
           }
@@ -56,7 +56,6 @@ self.addEventListener('fetch', evento => {
         });
       }).catch(() => {
         if (evento.request.mode === 'navigate') {
-          // CORREÇÃO MÁXIMA: Agora ele sempre devolve a mesma página exata que você pediu (ex: caixinha.html)
           return caches.match(evento.request.url, { ignoreSearch: true });
         }
       })
