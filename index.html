@@ -359,11 +359,27 @@
     // Variável para armazenar qual ação o usuário quer fazer após digitar a senha
     let acaoPendente = '';
 
-    window.onload = function() {
-        document.getElementById('tela-login').style.display = 'flex';
+    // ==========================================
+    // INICIALIZAÇÃO ROBUSTA (Evita travamentos de cache PWA)
+    // ==========================================
+    function inicializarAppOffline() {
+        if (document.getElementById('tela-principal').style.display !== 'block' && document.getElementById('tela-planilha').style.display !== 'block') {
+            document.getElementById('tela-login').style.display = 'flex';
+        }
         calcularTotal();
         carregarConfiguracoesSalvas(); 
-    };
+        
+        // Truque para forçar o navegador a redesenhar a tela
+        document.body.offsetHeight; 
+    }
+
+    document.addEventListener('DOMContentLoaded', inicializarAppOffline);
+
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            inicializarAppOffline();
+        }
+    });
 
     function getDeviceID() {
         let id = localStorage.getItem('wm_device_id');
@@ -465,8 +481,14 @@
     async function validarAcesso() {
         const senhaDigitada = document.getElementById('senha-input').value;
         const hashDigitado = await gerarHash(senhaDigitada);
+        
         if (hashDigitado === HASH_SENHA_MESTRA) {
             document.getElementById('tela-login').style.display = 'none';
+            
+            // >>> CORREÇÃO DO BUG AQUI <<<
+            // Antes a tela principal continuava invisível. Agora forçamos ela a aparecer!
+            document.getElementById('tela-principal').style.display = 'block'; 
+            
             document.getElementById('senha-input').value = '';
             document.getElementById('erro-login').style.display = 'none';
         } else {
@@ -756,21 +778,18 @@
 
     function gerarPDF() { abrirPlanilha(); setTimeout(() => { window.print(); }, 1500); }
 
-    // NOVA FUNÇÃO DE ENCERRAMENTO (100% OFF-LINE)
+    // ENCERRAMENTO (100% OFF-LINE)
     function encerrarRelatorio() { 
         if(confirm("Apagar toda a ficha do aparelho? Faça isso apenas DEPOIS de gerar e enviar o PDF!")) { 
             
-            // 1. Apaga os dados do banco de dados local do celular
             localStorage.removeItem('wm_registros_refeicao');
             localStorage.removeItem('wm_campos_salvos'); 
             
-            // 2. Limpa as variáveis da memória ativa do app
             banco = [];
             indiceEdicao = -1;
             calcularTotal();
             document.getElementById('corpo-tabela').innerHTML = "";
 
-            // 3. Limpa os campos visíveis do formulário e zera checkboxes
             document.getElementById('nome-completo').value = '';
             document.getElementById('cpf').value = '';
             document.getElementById('empresa').value = '';
@@ -798,12 +817,10 @@
 
             verificarCondicionais();
             
-            // 4. Esconde as telas do app e mostra a tela de LOGIN (ACESSO RESTRITO)
             document.getElementById('tela-principal').style.display = 'none';
             document.getElementById('tela-planilha').style.display = 'none';
             document.getElementById('tela-login').style.display = 'flex';
             
-            // 5. Zera o campo de senha para exigir nova digitação
             document.getElementById('senha-input').value = '';
             document.getElementById('erro-login').style.display = 'none';
             
@@ -831,9 +848,13 @@
             console.log("Erro no Service Worker:", err);
         });
         
+        // TRUQUE ADICIONAL PARA RE-RENDERIZAR A TELA AO VOLTAR DO MINIMIZADO
         document.addEventListener("visibilitychange", () => {
             if (document.visibilityState === "visible") {
-                navigator.serviceWorker.ready.then(reg => reg.update());
+                document.body.offsetHeight; // Força redesenho
+                if (navigator.serviceWorker) {
+                    navigator.serviceWorker.ready.then(reg => reg.update());
+                }
             }
         });
     }
