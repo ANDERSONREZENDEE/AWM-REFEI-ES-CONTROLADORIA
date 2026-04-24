@@ -24,7 +24,7 @@
 
     <style>
         :root {
-            --azul-wm: #1a233a; 
+            --azul-wm: #002060; /* Ajustado para o tom de azul do Print 2 */
             --laranja-wm: #f39c12; 
             --verde-pos: #28a745;
             --vermelho-neg: #dc3545;
@@ -71,9 +71,10 @@
         #tela-planilha { display: none; padding: 10px; background: white; min-height: 90vh; }
         .tabela-container { overflow-x: auto; margin-top: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%; }
 
-        table { width: 100%; min-width: 800px; border-collapse: collapse; font-size: 11px; background: white; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; vertical-align: middle; }
-        th { background-color: var(--azul-wm); color: white; }
+        /* NOVA FORMATAÇÃO DA TABELA ESTILO EXCEL */
+        table { width: 100%; min-width: 1200px; /* Largura grande para não espremer */ border-collapse: collapse; font-size: 12px; background: white; }
+        th, td { border: 1px solid #ddd; padding: 10px 8px; text-align: center; vertical-align: middle; white-space: nowrap; /* Não quebra linha */ }
+        th { background-color: var(--azul-wm); color: white; text-transform: uppercase; font-size: 11px; }
 
         .foto-miniatura { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; cursor: pointer; display: block; margin-top: 3px; }
         .anexo-box { display: flex; flex-direction: column; align-items: center; margin-bottom: 5px; background: #f9f9f9; padding: 5px; border-radius: 4px; border: 1px solid #eee; text-align: center; max-width: 80px; }
@@ -94,13 +95,16 @@
             @page { size: landscape; margin: 0.5cm; }
             body, html { display: block !important; background-color: white !important; height: auto !important; min-height: auto !important; overflow: visible !important; margin: 0 !important; padding: 0 !important; }
             .app-container { border: none !important; box-shadow: none !important; max-width: 100% !important; width: 100% !important; display: block !important; height: auto !important; min-height: auto !important; overflow: visible !important; padding: 0 !important; margin: 0 !important; }
-            .formulario, .area-acoes, .btn-voltar, .btn-ver-planilha, th:last-child, td:last-child { display: none !important; }
+            .formulario, .area-acoes, .btn-voltar, .btn-ver-planilha { display: none !important; }
             #tela-planilha, .tabela-container { display: block !important; overflow: visible !important; height: auto !important; width: 100% !important; margin: 0 !important; padding: 0 !important; border: none !important; }
-            table { display: table !important; font-size: 9px !important; width: 100% !important; margin-top: 5px !important; table-layout: fixed !important; word-wrap: break-word !important; }
+            /* Esconde as ações na impressão */
+            th:last-child, td:last-child { display: none !important; }
+            
+            table { display: table !important; font-size: 9px !important; width: 100% !important; min-width: auto !important; margin-top: 5px !important; table-layout: auto !important; word-wrap: normal !important; }
             tr { display: table-row !important; page-break-inside: avoid; }
-            th, td { display: table-cell !important; padding: 4px !important; }
+            th, td { display: table-cell !important; padding: 4px !important; white-space: nowrap !important; }
             .cabecalho-oficial { border: 1px solid #000 !important; padding: 8px !important; margin-bottom: 5px !important; border-radius: 0 !important; }
-            .foto-miniatura { width: 60px !important; height: auto !important; max-height: 60px !important; object-fit: contain !important; }
+            .foto-miniatura { width: 40px !important; height: auto !important; max-height: 40px !important; object-fit: contain !important; }
         }
 
         #modal-foto { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; }
@@ -336,14 +340,18 @@
             <table id="tabela-dados">
                 <thead>
                     <tr>
-                        <th>Data / Hora</th>
-                        <th>Colaborador / CPF</th>
-                        <th>Empresa / Função</th>
-                        <th>Obra / Restaurante</th>
-                        <th>Refeição</th>
-                        <th>Valor (R$)</th>
-                        <th>Fotos</th>
-                        <th>Ações</th>
+                        <th>DATA</th>
+                        <th>HORA</th>
+                        <th>COLABORADOR</th>
+                        <th>CPF</th>
+                        <th>EMPRESA</th>
+                        <th>FUNÇÃO</th>
+                        <th>OBRA</th>
+                        <th>RESTAURANTE</th>
+                        <th>REFEIÇÃO</th>
+                        <th>VALOR (R$)</th>
+                        <th>FOTOS</th>
+                        <th>AÇÕES</th>
                     </tr>
                 </thead>
                 <tbody id="corpo-tabela"></tbody>
@@ -367,6 +375,7 @@
     // INICIALIZAÇÃO ROBUSTA E SESSÃO ISOLADA
     // ==========================================
     function inicializarAppOffline() {
+        // Usando chave ESPECÍFICA de Refeições para não dar conflito com o Caixinha
         if (localStorage.getItem('wm_refeicoes_sessao_ativa') === 'true') {
             document.getElementById('tela-login').style.display = 'none';
             if (document.getElementById('tela-planilha').style.display !== 'block') {
@@ -513,7 +522,6 @@
         document.getElementById('modal-acao').style.display = 'flex';
 
         if(acao === 'encerrar') {
-            // CORREÇÃO DO TEXTO DO MODAL
             document.getElementById('texto-acao-modal').innerText = "Senha necessária para ENCERRAR A REFEIÇÃO";
         }
     }
@@ -709,7 +717,7 @@
         let somaTotal = 0;
 
         banco.forEach((item, index) => {
-            let fotosHTML = `<div style="display:flex; flex-direction:row; gap:5px;">`;
+            let fotosHTML = `<div style="display:flex; flex-direction:row; gap:5px; justify-content:center;">`;
             if(item.fotoLocal) fotosHTML += `<div class="anexo-box"><span class="legenda-foto">Local</span><img src="${item.fotoLocal}" class="foto-miniatura" onclick="verFoto('${item.fotoLocal}')"></div>`;
             if(item.fotoAssinatura) fotosHTML += `<div class="anexo-box"><span class="legenda-foto">Assin.</span><img src="${item.fotoAssinatura}" class="foto-miniatura" onclick="verFoto('${item.fotoAssinatura}')"></div>`;
             fotosHTML += `</div>`;
@@ -721,17 +729,24 @@
             let valorNumerico = parseFloat(item.preco.replace('R$ ', '').replace('.', '').replace(',', '.')) || 0;
             somaTotal += valorNumerico;
 
+            // INSERÇÃO DAS COLUNAS INDIVIDUAIS (Estilo Excel)
             corpo.innerHTML += `<tr>
-                <td>${item.dataReg}<br><b>${item.horaReg}</b></td>
-                <td><b>${item.nome}</b><br><span style="color:#555; font-size:10px;">CPF: ${item.cpf}</span></td>
-                <td>${displayEmpresa}<br><span style="color:#555; font-size:10px;">${item.funcao_txt}</span></td>
-                <td>${displayObra}<br><span style="color:#f39c12; font-size:10px;"><b>${displayRestaurante}</b></span></td>
+                <td>${item.dataReg}</td>
+                <td><b>${item.horaReg}</b></td>
+                <td style="text-align:left;"><b>${item.nome}</b></td>
+                <td>${item.cpf}</td>
+                <td>${displayEmpresa}</td>
+                <td>${item.funcao_txt}</td>
+                <td>${displayObra}</td>
+                <td style="color:#f39c12;"><b>${displayRestaurante}</b></td>
                 <td><b>${item.refeicao}</b></td>
-                <td style="color:green; font-weight:bold; white-space:nowrap;">${item.preco}</td>
+                <td style="color:green; font-weight:bold;">${item.preco}</td>
                 <td>${fotosHTML}</td>
-                <td style="text-align:center;">
-                    <button onclick="editar(${index})" style="background:orange; color:white; border:none; padding:8px; border-radius:3px; cursor:pointer; margin-bottom:5px; width: 100%;">✏️ Editar</button>
-                    <button onclick="excluir(${index})" style="background:red; color:white; border:none; padding:8px; border-radius:3px; cursor:pointer; width: 100%;">🗑️ Excluir</button>
+                <td>
+                    <div style="display:flex; gap:5px; justify-content:center;">
+                        <button onclick="editar(${index})" style="background:orange; color:white; border:none; padding:8px; border-radius:3px; cursor:pointer; width:100%;">✏️ Editar</button>
+                        <button onclick="excluir(${index})" style="background:red; color:white; border:none; padding:8px; border-radius:3px; cursor:pointer; width:100%;">🗑️ Excluir</button>
+                    </div>
                 </td>
             </tr>`;
         });
@@ -768,6 +783,7 @@
     function encerrarRelatorio() { 
         if(confirm("Apagar toda a ficha do aparelho? Faça isso apenas DEPOIS de gerar e enviar o PDF!")) { 
             
+            // 1. Apaga APENAS os dados de Refeições da memória (Protege o Caixinha!)
             localStorage.removeItem('wm_registros_refeicao');
             localStorage.removeItem('wm_campos_salvos'); 
             localStorage.removeItem('wm_refeicoes_sessao_ativa'); 
@@ -823,14 +839,12 @@
                 try {
                     const nomesCaches = await caches.keys();
                     await Promise.all(nomesCaches.map(nome => {
-                        // Apaga SOMENTE o cache das refeições para forçar o download novo
                         if (nome.startsWith('refeicoes-wm-')) return caches.delete(nome);
                     }));
                 } catch (e) {
                     console.error("Erro ao limpar o cache isolado:", e);
                 }
             }
-            // Recarrega a página forçando ignorar o cache antigo no navegador
             window.location.href = window.location.pathname + '?atualizar=' + new Date().getTime();
         }
     }
@@ -843,7 +857,6 @@
                 novoWorker.onstatechange = () => {
                     if (novoWorker.state === 'installed' && navigator.serviceWorker.controller) {
                         console.log("Nova versão detectada! Atualizando app silenciosamente...");
-                        window.location.reload(true);
                     }
                 };
             };
