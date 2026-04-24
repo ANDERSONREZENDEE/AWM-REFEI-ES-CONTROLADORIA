@@ -1,5 +1,5 @@
 const PREFIXO_CACHE = 'refeicoes-wm-';
-const CACHE_NAME = PREFIXO_CACHE + 'v2'; 
+const CACHE_NAME = PREFIXO_CACHE + 'v3'; 
 
 // Arquivos principais para guardar offline imediatamente
 const arquivosParaGuardar = [
@@ -17,8 +17,7 @@ const arquivosParaGuardar = [
 
 self.addEventListener('install', evento => {
   evento.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(arquivosParaGuardar))
+    caches.open(CACHE_NAME).then(cache => cache.addAll(arquivosParaGuardar))
   );
   self.skipWaiting();
 });
@@ -28,10 +27,7 @@ self.addEventListener('activate', evento => {
     caches.keys().then(nomesCaches => {
       return Promise.all(
         nomesCaches.map(nomeCache => {
-          // 🛡️ REGRA DE OURO: Só apaga se pertencer ao App de Refeições E for uma versão velha
-          // O cache do app Caixinha fica 100% intocado!
           if (nomeCache.startsWith(PREFIXO_CACHE) && nomeCache !== CACHE_NAME) {
-            console.log('Apagando cache antigo de Refeições:', nomeCache);
             return caches.delete(nomeCache);
           }
         })
@@ -59,7 +55,7 @@ self.addEventListener('fetch', evento => {
         });
       }).catch(() => {
         if (evento.request.mode === 'navigate') {
-          return caches.match('./index.html', { ignoreSearch: true });
+          return caches.match(evento.request.url, { ignoreSearch: true });
         }
       })
   );
