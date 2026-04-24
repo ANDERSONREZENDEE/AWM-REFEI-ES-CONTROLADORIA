@@ -3,15 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WM Construções - Refeições</title>
-
-    <link rel="manifest" href="manifest.json">
+    <title>Caixinha WM - App e Ver Senha</title>
+    
+   <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icone_v3.png">
     <link rel="icon" type="image/png" href="icone_v3.png">
 
     <script>
-        // Bloqueio de F12 e inspeção
+        // 1. Bloqueia o Botão Direito do Mouse imediatamente
         document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // 2. Bloqueia F12, Inspecionar Elemento, Exibir Código Fonte e Salvar Página
         document.addEventListener('keydown', function(e) {
             if (e.key === 'F12' || 
                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
@@ -21,48 +23,59 @@
             }
         });
     </script>
-
+    
     <style>
         :root {
-            --azul-wm: #002060; /* Ajustado para o tom de azul do Print 2 */
+            --azul-wm: #1a233a; 
             --laranja-wm: #f39c12; 
             --verde-pos: #28a745;
             --vermelho-neg: #dc3545;
             --fundo: #f4f7f6;
         }
 
+        /* ========================================== */
+        /* 🛡️ BLOQUEIO DE SELEÇÃO DE TEXTO NO APP   */
+        /* ========================================== */
         body { 
             font-family: Arial, sans-serif; background-color: #ccc; margin: 0; display: flex; justify-content: center; padding: 10px; 
-            -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; -webkit-touch-callout: none;
+            -webkit-user-select: none; 
+            -moz-user-select: none; 
+            -ms-user-select: none; 
+            user-select: none; 
+            -webkit-touch-callout: none; 
         }
-
+        
         input, select, textarea {
-            box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; width: 100%; padding: 10px; margin-top: 3px;
-            -webkit-user-select: auto; -moz-user-select: auto; -ms-user-select: auto; user-select: auto;
+            -webkit-user-select: auto;
+            -moz-user-select: auto;
+            -ms-user-select: auto;
+            user-select: auto;
         }
+        /* ========================================== */
 
         .app-container { width: 100%; max-width: 700px; background-color: var(--fundo); min-height: 95vh; border: 8px solid; border-image: linear-gradient(to right, var(--azul-wm) 50%, var(--laranja-wm) 50%) 1; box-shadow: 0 5px 15px rgba(0,0,0,0.3); box-sizing: border-box; position: relative; }
-
+        
         header { background-color: white; color: var(--azul-wm); padding: 15px 10px; text-align: center; font-weight: bold; display: flex; flex-direction: column; align-items: center; gap: 10px; border-bottom: 2px solid #ddd; }
-
-        .logos-container { display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 15px; width: 100%; box-sizing: border-box; padding: 0 10px; overflow: hidden; }
-        .logo-wm, .logo-controladoria { max-width: 45%; max-height: 60px; object-fit: contain; pointer-events: none; }
-
+        
+        .logos-container { display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 15px; width: 100%; }
+        .logo-wm { width: 40%; max-width: 150px; height: auto; pointer-events: none; } 
+        .logo-controladoria { width: 40%; max-width: 150px; height: auto; border-radius: 4px; pointer-events: none; }
+        
         .titulo-header { font-size: 15px; color: var(--laranja-wm); margin-top: 5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
 
         .painel-saldo, .formulario, .area-acoes { background: white; margin: 10px; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .saldo-atual { font-size: 20px; font-weight: bold; text-align: center; margin-top: 5px; color: var(--azul-wm); }
-
-        .formulario { display: flex; flex-direction: column; gap: 8px; }
+        .linha-saldo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 14px; }
+        .saldo-atual { font-size: 20px; font-weight: bold; text-align: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
+        .positivo { color: var(--verde-pos) !important; font-weight: bold; }
+        .negativo { color: var(--vermelho-neg) !important; font-weight: bold; }
         
-        .label-linha { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 8px; }
-        label { font-size: 12px; font-weight: bold; color: #555; }
-        .chk-pequeno { font-size: 10px; color: #333; display: flex; align-items: center; gap: 4px; font-weight: normal; cursor: pointer; background: #e2e8f0; padding: 3px 6px; border-radius: 4px; border: 1px solid #cbd5e1; }
-        .chk-pequeno input { width: 14px; height: 14px; margin: 0; cursor: pointer; padding: 0; }
-
-        .btn-salvar { background-color: var(--azul-wm); color: white; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        .formulario { display: flex; flex-direction: column; gap: 10px; }
+        label { font-size: 12px; font-weight: bold; color: #555; margin-top: 5px; }
+        input, select { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        
+        .btn-salvar { background-color: var(--azul-wm); color: white; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .btn-ver-planilha { background-color: var(--laranja-wm); color: white; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 5px;}
-
+        
         .area-acoes { display: flex; flex-wrap: wrap; gap: 10px; }
         .btn-pausar { background-color: #17a2b8; color: white; border: none; padding: 12px; font-size: 14px; border-radius: 5px; flex: 1; font-weight: bold; cursor: pointer;}
         .btn-whats { background-color: #25D366; color: white; border: none; padding: 15px; font-size: 14px; border-radius: 5px; flex: 1 1 100%; font-weight: bold; cursor: pointer; }
@@ -70,15 +83,14 @@
 
         #tela-planilha { display: none; padding: 10px; background: white; min-height: 90vh; }
         .tabela-container { overflow-x: auto; margin-top: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%; }
-
-        /* NOVA FORMATAÇÃO DA TABELA ESTILO EXCEL */
-        table { width: 100%; min-width: 1200px; /* Largura grande para não espremer */ border-collapse: collapse; font-size: 12px; background: white; }
-        th, td { border: 1px solid #ddd; padding: 10px 8px; text-align: center; vertical-align: middle; white-space: nowrap; /* Não quebra linha */ }
-        th { background-color: var(--azul-wm); color: white; text-transform: uppercase; font-size: 11px; }
-
+        
+        table { width: 100%; min-width: 600px; border-collapse: collapse; font-size: 11px; background: white; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; vertical-align: middle; }
+        th { background-color: var(--azul-wm); color: white; }
+        
         .foto-miniatura { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; cursor: pointer; display: block; margin-top: 3px; }
-        .anexo-box { display: flex; flex-direction: column; align-items: center; margin-bottom: 5px; background: #f9f9f9; padding: 5px; border-radius: 4px; border: 1px solid #eee; text-align: center; max-width: 80px; }
-        .legenda-foto { font-size: 9px; font-weight: bold; color: var(--azul-wm); word-wrap: break-word; text-align: center; }
+        .anexo-box { display: flex; flex-direction: column; align-items: center; margin-bottom: 5px; background: #f9f9f9; padding: 5px; border-radius: 4px; border: 1px solid #eee; text-align: center; max-width: 120px; }
+        .legenda-foto { font-size: 10px; font-weight: bold; color: var(--azul-wm); word-wrap: break-word; text-align: center; }
 
         .cabecalho-oficial { display: block; font-size: 13px; line-height: 1.4; background: white; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 10px; overflow: hidden; }
         .cabecalho-topo { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 5px; gap: 5px; }
@@ -86,35 +98,47 @@
         .texto-cabecalho { text-align: center; flex: 1; min-width: 0; }
         .texto-cabecalho h3 { margin: 0; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .texto-cabecalho small { color: #555; font-size: 9px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        .campo-condicional { display: none; background: #fff3cd; padding: 8px; border-left: 3px solid #ffc107; margin-top: 5px; border-radius: 3px; }
-        .erro-msg { color: var(--vermelho-neg); font-size: 11px; font-weight: bold; display: none; margin-top: 3px; }
+        
+        .cabecalho-oficial .info-box { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 8px; border-top: 1px solid #ccc; padding-top: 8px; }
 
         @media print {
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             @page { size: landscape; margin: 0.5cm; }
             body, html { display: block !important; background-color: white !important; height: auto !important; min-height: auto !important; overflow: visible !important; margin: 0 !important; padding: 0 !important; }
             .app-container { border: none !important; box-shadow: none !important; max-width: 100% !important; width: 100% !important; display: block !important; height: auto !important; min-height: auto !important; overflow: visible !important; padding: 0 !important; margin: 0 !important; }
-            .formulario, .area-acoes, .btn-voltar, .btn-ver-planilha { display: none !important; }
-            #tela-planilha, .tabela-container { display: block !important; overflow: visible !important; height: auto !important; width: 100% !important; margin: 0 !important; padding: 0 !important; border: none !important; }
-            /* Esconde as ações na impressão */
-            th:last-child, td:last-child { display: none !important; }
-            
-            table { display: table !important; font-size: 9px !important; width: 100% !important; min-width: auto !important; margin-top: 5px !important; table-layout: auto !important; word-wrap: normal !important; }
-            tr { display: table-row !important; page-break-inside: avoid; }
-            th, td { display: table-cell !important; padding: 4px !important; white-space: nowrap !important; }
-            .cabecalho-oficial { border: 1px solid #000 !important; padding: 8px !important; margin-bottom: 5px !important; border-radius: 0 !important; }
-            .foto-miniatura { width: 40px !important; height: auto !important; max-height: 40px !important; object-fit: contain !important; }
+            .formulario, .area-acoes, .btn-voltar, .btn-ver-planilha, th:last-child, td:last-child { display: none !important; }
+            #tela-planilha, .tabela-container { display: block !important; overflow: visible !important; overflow-x: visible !important; overflow-y: visible !important; height: auto !important; width: 100% !important; margin: 0 !important; padding: 0 !important; border: none !important; }
+            table { display: table !important; font-size: 10px !important; width: 100% !important; min-width: auto !important; max-width: 100% !important; page-break-inside: auto; margin-top: 5px !important; table-layout: fixed !important; word-wrap: break-word !important; }
+            tr { display: table-row !important; page-break-inside: avoid; page-break-after: auto; }
+            th, td { display: table-cell !important; padding: 4px !important; word-wrap: break-word !important; overflow-wrap: break-word !important; white-space: normal !important; }
+            thead { display: table-header-group !important; }
+            tfoot { display: table-footer-group !important; }
+            tbody { display: table-row-group !important; }
+            .cabecalho-oficial { display: block !important; border: 1px solid #000 !important; padding: 8px !important; margin-bottom: 5px !important; border-radius: 0 !important; }
+            .cabecalho-oficial .info-box { grid-template-columns: 1fr 1fr !important; }
+            .img-cabecalho { height: 50px !important; max-width: none !important; }
+            .texto-cabecalho h3 { font-size: 16px !important; white-space: normal !important; overflow: visible !important; }
+            .texto-cabecalho small { font-size: 12px !important; white-space: normal !important; overflow: visible !important; }
+            .foto-miniatura { width: 80px !important; height: auto !important; max-height: 80px !important; object-fit: contain !important; }
+            .anexo-box { border: none !important; padding: 0 !important; background: transparent !important; margin-bottom: 2px !important; }
+            .legenda-foto { font-size: 9px !important; }
         }
 
         #modal-foto { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; }
         #foto-ampliada { max-width: 90%; max-height: 80%; border: 3px solid white; pointer-events: none; }
 
+        /* ESTILOS DA TELA DE LOGIN E MODAL DE AÇÃO */
         #tela-login, #modal-acao {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--azul-wm); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--azul-wm);
+            z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
         #modal-acao { background: rgba(26, 35, 58, 0.9); display: none; }
-        .login-box { background: white; padding: 25px; border-radius: 10px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .login-box {
+            background: white; padding: 25px; border-radius: 10px; width: 85%; max-width: 320px;
+            text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
         .login-box img { max-height: 60px; margin-bottom: 10px; object-fit: contain; pointer-events: none; }
     </style>
 </head>
@@ -124,8 +148,8 @@
     <div class="login-box">
         <img src="LOGOTIPO.jpg" alt="Logo WM">
         <h3 style="color: var(--azul-wm); margin-top: 0; margin-bottom: 5px;">ACESSO RESTRITO</h3>
-        <p style="color: #666; font-size: 12px; margin-bottom: 5px;">WM Construções - Refeições</p>
-
+        <p style="color: #666; font-size: 12px; margin-bottom: 5px;">Área exclusiva para funcionários</p>
+        
         <div style="position: relative; width: 100%; margin: 15px 0;">
             <input type="password" id="senha-input" placeholder="SENHA" style="width: 100%; margin: 0; padding-right: 40px; text-align: center; font-size: 20px; font-weight: bold; letter-spacing: 2px;">
             <img id="icone-olho" src="OLHOFECHADO_V2.png" onclick="mostrarSenha()" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; height: 26px; width: 26px; object-fit: contain; pointer-events: auto;" title="Mostrar/Ocultar Senha">
@@ -160,179 +184,157 @@
         <header>
             <div class="logos-container">
                 <img src="LOGOTIPO.jpg" alt="WM" class="logo-wm">
-                <img src="Captura de tela 2026-02-13 132630.jpg" alt="Controladoria" class="logo-controladoria">
+                <img src="Captura de tela 2026-02-13 132630.jpg" alt="Anderson" class="logo-controladoria">
             </div>
-            <div class="titulo-header">🍽️ AWM REFEIÇÕES 🍽️</div>
+            <div class="titulo-header">✨ GESTÃO INTELIGENTE DE CAIXINHA ✨</div>
         </header>
 
         <div class="painel-saldo">
-            <div class="saldo-atual" id="total-registros">0 Refeições Registradas</div>
-            <p style="text-align: center; font-size: 11px; color: #777; margin-top: 5px;">(Neste dispositivo)</p>
+            <div style="background: #fdf5e6; padding: 10px; border-radius: 4px;">
+                <div class="linha-saldo">
+                    <label>Nº DO CAIXINHA:</label>
+                    <input type="text" id="num-caixinha" placeholder="Ex: 13" style="width: 80px; text-align: center; font-weight: bold;" onchange="salvarCabecalho()">
+                </div>
+                <div class="linha-saldo">
+                    <label>GESTOR:</label>
+                    <input type="text" id="nome-gestor" placeholder="Nome do Gestor" style="width: 150px;" onchange="salvarCabecalho()">
+                </div>
+                <div class="linha-saldo" style="border-top: 1px solid #ddd; padding-top: 5px;">
+                    <span style="font-weight: bold;">AUDITOR:</span>
+                    <span>Anderson e/ou Flávio</span>
+                </div>
+            </div>
+
+            <div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; flex-direction: column;">
+                    <label style="margin:0;">Saldo Anterior (R$):</label>
+                    <span style="font-size: 10px; color: #777; font-weight: normal;">(Se for negativo, colocar o sinal de -)</span>
+                </div>
+                <input type="number" id="saldo-anterior" step="0.01" style="width: 110px; text-align: center; font-weight: bold;" onchange="salvarCabecalho()">
+            </div>
+            
+            <div class="linha-saldo" style="color: var(--verde-pos); margin-top: 10px;">
+                <span>Total Créditos WM:</span>
+                <span id="total-creditos">R$ 0,00</span>
+            </div>
+            
+            <div class="linha-saldo" style="color: var(--vermelho-neg);">
+                <span>Total Débitos:</span>
+                <span id="total-gasto">R$ 0,00</span>
+            </div>
+            
+            <div class="saldo-atual" id="saldo-atual-display">SALDO ATUAL: R$ 0,00</div>
         </div>
 
         <div class="formulario">
+            <label>Categoria:</label>
+            <select id="categoria">
+                <option value="CRÉDITO WM CONSTRUÇÕES E MONTAGENS">CRÉDITO WM CONSTRUÇÕES E MONTAGENS</option>
+                <option value="Alimentação">Alimentação</option>
+                <option value="Hospedagem">Hospedagem</option>
+                <option value="Transporte">Transporte</option>
+                <option value="Combustível">Combustível</option>
+                <option value="Outras Despesas">Outras Despesas</option>
+            </select>
+            <label>Data:</label>
+            <input type="date" id="data">
             
-            <div class="label-linha">
-                <label>Nome completo: <span style="color:red">*</span></label>
-                <label class="chk-pequeno" title="Deixar gravado para o próximo registro"><input type="checkbox" id="chk-nome"> ✅ Salvar</label>
-            </div>
-            <input type="text" id="nome-completo" placeholder="Digite o nome completo">
+            <label>Fornecedor: <span style="color:red">*</span></label>
+            <input type="text" id="fornecedor" placeholder="Ex: Posto Ipiranga, WM Construções e Montagens...">
+            
+            <label>Descrição do Gasto/Crédito: <span style="color:red">*</span></label>
+            <input type="text" id="desc" placeholder="Ex: Gasto com almoço, Crédito WM, etc...">
+            
+            <label>Valor (R$): <span style="color:red">*</span></label>
+            <input type="number" id="valor" step="0.01" placeholder="0.00">
 
-            <div class="label-linha">
-                <label>CPF: <span style="color:red">*</span></label>
-                <label class="chk-pequeno"><input type="checkbox" id="chk-cpf"> ✅ Salvar</label>
-            </div>
-            <input type="text" id="cpf" placeholder="000.000.000-00" oninput="mascaraCPF(this)" onkeyup="verificarErroCPF()">
-            <div id="erro-cpf" class="erro-msg">CPF INVÁLIDO!!!</div>
-
-            <div class="label-linha">
-                <label>Empresa: <span style="color:red">*</span></label>
-                <label class="chk-pequeno"><input type="checkbox" id="chk-empresa"> ✅ Salvar</label>
-            </div>
-            <select id="empresa" onchange="verificarCondicionais()">
-                <option value="" disabled selected>--- Selecione na lista suspensa ---</option>
-                <option value="WM Construções e Montagens">WM Construções e Montagens</option>
-                <option value="Outra Empresa">Outra Empresa</option>
-            </select>
-            <div id="div-qual-empresa" class="campo-condicional">
-                <label>Qual empresa? <span style="color:red">*</span></label>
-                <input type="text" id="qual-empresa" placeholder="Digite o nome da empresa">
-            </div>
-
-            <div class="label-linha">
-                <label>Função (Digite para buscar): <span style="color:red">*</span></label>
-                <label class="chk-pequeno"><input type="checkbox" id="chk-funcao"> ✅ Salvar</label>
-            </div>
-            <input list="lista-funcoes" id="funcao" placeholder="--- Digite ou selecione na lista ---">
-            <datalist id="lista-funcoes">
-                <option value="Ajudante Geral">
-                <option value="Almoxarife">
-                <option value="Armador">
-                <option value="Carpinteiro">
-                <option value="Eletricista de Manutenção">
-                <option value="Eletricista Montador">
-                <option value="Encarregado de Obras">
-                <option value="Encarregado de Montagem">
-                <option value="Engenheiro Civil">
-                <option value="Engenheiro Eletricista">
-                <option value="Guindasteiro">
-                <option value="Marteleteiro">
-                <option value="Mecânico de Manutenção">
-                <option value="Montador de Estruturas">
-                <option value="Motorista de Munck">
-                <option value="Operador de Escavadeira">
-                <option value="Pedreiro">
-                <option value="Pintor">
-                <option value="Servente">
-                <option value="Soldador">
-                <option value="Técnico de Segurança do Trabalho">
-                <option value="Topógrafo">
-            </datalist>
-
-            <div class="label-linha">
-                <label>Obra: <span style="color:red">*</span></label>
-                <label class="chk-pequeno"><input type="checkbox" id="chk-obra"> ✅ Salvar</label>
-            </div>
-            <select id="obra" onchange="verificarCondicionais()">
-                <option value="" disabled selected>--- Selecione na lista suspensa ---</option>
-                <option value="Boquira/BA">Boquira/BA</option>
-                <option value="Brumado/BA">Brumado/BA</option>
-                <option value="Paratinga/BA">Paratinga/BA</option>
-                <option value="Paulo Afonso/BA">Paulo Afonso/BA</option>
-                <option value="Pratudão/BA">Pratudão/BA</option>
-                <option value="Cachoeirinha/PE">Cachoeirinha/PE</option>
-                <option value="Ribeirão/PE">Ribeirão/PE</option>
-                <option value="Ceará-Mirim/RN">Ceará-Mirim/RN</option>
-                <option value="Manutenção Geral/RN">Manutenção Geral/RN</option>
-                <option value="Outra Obra">Outra Obra (Adicionar)</option>
-            </select>
-            <div id="div-qual-obra" class="campo-condicional">
-                <label>Qual Obra? <span style="color:red">*</span></label>
-                <input type="text" id="qual-obra" placeholder="Digite o nome da obra">
+            <div style="background: #f9f9f9; padding: 10px; border-radius: 5px; border: 1px solid #eee;">
+                <label>Tipo de Documento Fiscal:</label>
+                <select id="tipo-doc">
+                    <option value="🚨 SEM DOCUMENTO FISCAL (FALTANDO)">🚨 SEM DOCUMENTO FISCAL (FALTANDO)</option>
+                    <option value="NF-e - Nota Fiscal Eletrônica">NF-e - Nota Fiscal Eletrônica</option>
+                    <option value="NFC-e - Nota de Consumidor Eletrônica">NFC-e - Nota de Consumidor Eletrônica</option>
+                    <option value="NFS-e - Nota Fiscal de Serviço Eletrônica">NFS-e - Nota Fiscal de Serviço Eletrônica</option>
+                    <option value="CT-e - Conhecimento de Transporte">CT-e - Conhecimento de Transporte</option>
+                    <option value="MDF-e - Manifesto de Documentos Fiscais">MDF-e - Manifesto de Documentos Fiscais</option>
+                    <option value="BP-e - Bilhete de Passagem Eletrônico">BP-e - Bilhete de Passagem Eletrônico</option>
+                    <option value="CF-e / SAT - Cupom Fiscal Eletrônico">CF-e / SAT - Cupom Fiscal Eletrônico</option>
+                    <option value="NFA-e - Nota Fiscal Avulsa Eletrônica">NFA-e - Nota Fiscal Avulsa Eletrônica</option>
+                    <option value="Nota Fiscal de Produtor Rural">Nota Fiscal de Produtor Rural</option>
+                    <option value="Outros Documentos Fiscais">Outros Documentos Fiscais</option>
+                    <option value="RPA - Recibo de Pagamento a Autônomo">RPA - Recibo de Pagamento a Autônomo</option>
+                    <option value="Nota Promissória">Nota Promissória</option>
+                    <option value="Comprovante de Venda">Comprovante de Venda</option>
+                    <option value="Recibo">Recibo</option>
+                    <option value="Comanda">Comanda</option>
+                    <option value="Orçamento">Orçamento</option>            
+                    <option value="Conta de Energia Elétrica">Conta de Energia Elétrica</option>
+                    <option value="Conta de Água/Esgoto">Conta de Água/Esgoto</option>
+                    <option value="Conta de Telecomunicação/Internet">Conta de Telecomunicação/Internet</option>
+                    <option value="Conta de Fornecimento de Gás">Conta de Fornecimento de Gás</option>
+                </select>
+                <label>📸 Foto da Nota Fiscal:</label>
+                <input type="file" id="foto-doc" accept="image/*" capture="environment">
             </div>
 
-            <div class="label-linha">
-                <label>Restaurante: <span style="color:red">*</span></label>
-                <label class="chk-pequeno"><input type="checkbox" id="chk-restaurante"> ✅ Salvar</label>
-            </div>
-            <select id="restaurante" onchange="verificarCondicionais()">
-                <option value="" disabled selected>--- Selecione na lista suspensa ---</option>
-                <option value="Restaurante Mangai">Restaurante Mangai</option>
-                <option value="Restaurante Arco Verde">Restaurante Arco Verde</option>
-                <option value="Outro Restaurante">Outro Restaurante (Adicionar)</option>
-            </select>
-            <div id="div-qual-restaurante" class="campo-condicional">
-                <label>Qual Restaurante? <span style="color:red">*</span></label>
-                <input type="text" id="qual-restaurante" placeholder="Digite o nome do restaurante">
-            </div>
-
-            <div style="background: #e2e8f0; padding: 10px; border-radius: 5px; border: 1px solid #cbd5e1; margin-top: 5px;">
-                <div class="label-linha" style="margin-top: 0;">
-                    <label>Tabela de Preços (R$):</label>
-                    <label class="chk-pequeno"><input type="checkbox" id="chk-precos"> ✅ Salvar Preços</label>
-                </div>
-                <div style="display: flex; gap: 8px; margin-top: 5px;">
-                    <div style="flex: 1;">
-                        <label style="font-size: 10px; color: #555;">Café</label>
-                        <input type="text" id="preco-cafe" placeholder="0,00" oninput="mascaraMoeda(this)" style="padding: 8px; font-size: 12px;">
-                    </div>
-                    <div style="flex: 1;">
-                        <label style="font-size: 10px; color: #555;">Almoço</label>
-                        <input type="text" id="preco-almoco" placeholder="0,00" oninput="mascaraMoeda(this)" style="padding: 8px; font-size: 12px;">
-                    </div>
-                    <div style="flex: 1;">
-                        <label style="font-size: 10px; color: #555;">Jantar</label>
-                        <input type="text" id="preco-jantar" placeholder="0,00" oninput="mascaraMoeda(this)" style="padding: 8px; font-size: 12px;">
-                    </div>
-                </div>
+            <div style="background: #f9f9f9; padding: 10px; border-radius: 5px; border: 1px solid #eee;">
+                <label>Forma de Pagamento:</label>
+                <select id="forma-pagto">
+                    <option value="🚨 SEM COMPROVANTE PAGTO (FALTANDO)">🚨 SEM COMPROVANTE PAGTO (FALTANDO)</option>
+                    <option value="PIX">PIX</option>
+                    <option value="Cartão de Débito">Cartão de Débito</option>
+                    <option value="Cartão de Crédito">Cartão de Crédito</option>
+                    <option value="Boleto Bancário">Boleto Bancário</option>
+                    <option value="Transferência Bancária (TED/DOC)">Transferência Bancária (TED/DOC)</option>
+                    <option value="Depósito Bancário">Depósito Bancário</option>
+                    <option value="Cheque">Cheque</option>
+                    <option value="Vale / Voucher">Vale / Voucher (Alimentação, Refeição, etc.)</option>
+                    <option value="Dinheiro">Dinheiro</option>
+                    <option value="Outros">Outros</option>
+                </select>
+                <label>📸 Foto do Pagamento:</label>
+                <input type="file" id="foto-pagto" accept="image/*" capture="environment">
             </div>
 
-            <div class="label-linha">
-                <label>Selecione a Refeição Atendida: <span style="color:red">*</span></label>
-            </div>
-            <select id="refeicao" style="border: 2px solid var(--laranja-wm); font-weight: bold;">
-                <option value="" disabled selected>--- Selecione a Refeição ---</option>
-                <option value="Café da manhã">Café da manhã</option>
-                <option value="Almoço">Almoço</option>
-                <option value="Jantar">Jantar</option>
-            </select>
-
-            <div style="background: #fdf5e6; padding: 10px; border-radius: 5px; border: 1px solid #f39c12; margin-top: 10px;">
-                <label>📸 Foto do Local (obrigatório): <span style="color:red">*</span></label>
-                <input type="file" id="foto-local" accept="image/*" capture="environment">
-
-                <label style="margin-top:10px; display:block;">📸 Foto da assinatura (obrigatório): <span style="color:red">*</span></label>
-                <input type="file" id="foto-assinatura" accept="image/*" capture="environment">
-            </div>
-
-            <button class="btn-salvar" id="btn-salvar-principal" onclick="salvarRefeicao()">✅ Enviar (Salvar Registro)</button>
-            <button class="btn-ver-planilha" onclick="abrirPlanilha()">📊 Ver Registros Diários</button>
+            <button class="btn-salvar" id="btn-salvar-principal" onclick="salvarDespesa()">➕ Salvar na Lista</button>
+            <button class="btn-ver-planilha" onclick="abrirPlanilha()">📊 Ver Planilha</button>
         </div>
 
         <div class="area-acoes">
-            <button class="btn-pausar" onclick="salvarRascunhoSemSenha()">💾 SALVAR O RASCUNHO</button>
-            <button class="btn-whats" onclick="gerarPDF()">📲 GERAR RELATÓRIO PDF</button>
-            <button class="btn-encerrar" onclick="solicitarSenhaAcao('encerrar')">🏁 ENCERRAR A REFEIÇÃO</button>
+            <button class="btn-pausar" onclick="salvarPausar()">💾 Salvar e Pausar</button>
+            <button class="btn-whats" onclick="gerarPDF()">📲 GERAR PDF PARA COMPARTILHAR</button>
+            <button class="btn-encerrar" onclick="solicitarSenhaAcao('encerrar')">🏁 ENCERRAR O CAIXINHA</button>
             <button class="btn-whats" onclick="atualizarAppSeguro()" style="background-color: #34495e; margin-top: 5px;">🔄 ATUALIZAR APLICATIVO</button>
         </div>
     </div>
 
     <div id="tela-planilha">
         <button class="btn-voltar" onclick="voltarParaFormulario()" style="width: 100%; padding: 10px; margin-bottom: 10px; font-weight: bold; background: #555; color: white; border: none; border-radius: 5px; cursor: pointer;">⬅ Voltar para Lançamentos</button>
-
+        
         <div class="cabecalho-oficial" id="cabecalho-pdf">
             <div class="cabecalho-topo">
                 <img src="LOGOTIPO.jpg" class="img-cabecalho">
                 <div class="texto-cabecalho">
-                    <h3>CONTROLE DE REFEIÇÕES</h3>
+                    <h3>RELATÓRIO DE CAIXINHA</h3>
                     <small id="print-data-emissao"></small>
-                    <small id="print-device-id" style="color: #888; margin-top:3px;"></small>
                 </div>
                 <img src="Captura de tela 2026-02-13 132630.jpg" class="img-cabecalho">
             </div>
-            <div style="text-align: center; margin-top: 10px; font-weight: bold;">
-                TOTAL DE REFEIÇÕES: <span id="print-total" style="color: red; font-size: 14px;">0</span> | 
-                VALOR TOTAL: <span id="print-valor-total" style="color: green; font-size: 14px;">R$ 0,00</span>
+            <div class="info-box">
+                <div>
+                    <strong>EMPRESA:</strong> WM CONSTRUÇÕES E MONTAGENS<br>
+                    <strong>AUDITOR:</strong> Anderson e/ou Flávio<br>
+                    <strong>GESTOR:</strong> <span id="print-gestor"></span><br>
+                    <strong>Nº DO CAIXINHA:</strong> <span id="print-num"></span>
+                </div>
+                <div style="background: #fdf5e6; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <strong>Saldo Anterior:</strong> <span id="print-anterior"></span><br>
+                    <strong>Créditos:</strong> <span id="print-creditos" style="color:green"></span><br>
+                    <strong>Débitos:</strong> <span id="print-debitos" style="color:red"></span><br>
+                    <div style="border-top: 1px solid #ccc; margin-top: 5px; padding-top: 5px;">
+                        <strong>SALDO ATUAL:</strong> <span id="print-final" style="font-weight:bold; font-size: 14px;"></span>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -340,18 +342,13 @@
             <table id="tabela-dados">
                 <thead>
                     <tr>
-                        <th>DATA</th>
-                        <th>HORA</th>
-                        <th>COLABORADOR</th>
-                        <th>CPF</th>
-                        <th>EMPRESA</th>
-                        <th>FUNÇÃO</th>
-                        <th>OBRA</th>
-                        <th>RESTAURANTE</th>
-                        <th>REFEIÇÃO</th>
-                        <th>VALOR (R$)</th>
-                        <th>FOTOS</th>
-                        <th>AÇÕES</th>
+                        <th>Categoria</th>
+                        <th>Data</th>
+                        <th>Fornecedor</th>
+                        <th>Descrição</th>
+                        <th>Valor</th>
+                        <th>Anexos</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody id="corpo-tabela"></tbody>
@@ -366,137 +363,69 @@
 </div>
 
 <script>
+    // ==========================================
+    // 👀 LER ATALHOS DO ÍCONE (NOVO / PLANILHA)
+    // ==========================================
+    function verificarAtalhos() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('tela') === 'planilha') {
+            abrirPlanilha(); 
+        }
+    }
+
+    // ==========================================
+    // 🔒 CONFIGURAÇÃO DE SENHA DO APP (CAMUFLADA)
+    // ==========================================
     const _s = [53, 52, 52, 102, 55, 55, 97, 49, 102, 50, 50, 97, 51, 53, 50, 99, 52, 49, 54, 48, 56, 53, 56, 98, 50, 100, 55, 56, 55, 99, 98, 97, 57, 53, 55, 54, 98, 101, 54, 100, 55, 48, 98, 48, 101, 100, 53, 51, 98, 55, 52, 97, 56, 49, 51, 57, 99, 97, 56, 54, 49, 97, 54, 49];
     const HASH_SENHA_MESTRA = String.fromCharCode(..._s);
 
     let acaoPendente = '';
 
     // ==========================================
-    // INICIALIZAÇÃO ROBUSTA E SESSÃO ISOLADA
+    // INICIALIZAÇÃO ROBUSTA (Bloqueia o botão voltar)
     // ==========================================
     function inicializarAppOffline() {
-        // Usando chave ESPECÍFICA de Refeições para não dar conflito com o Caixinha
-        if (localStorage.getItem('wm_refeicoes_sessao_ativa') === 'true') {
+        if (localStorage.getItem('wm_sessao_ativa') === 'true') {
             document.getElementById('tela-login').style.display = 'none';
             if (document.getElementById('tela-planilha').style.display !== 'block') {
                 document.getElementById('tela-principal').style.display = 'block';
             }
         } else {
+            // Se não tem sessão, esconde TUDO e força o login
             document.getElementById('tela-principal').style.display = 'none';
             document.getElementById('tela-planilha').style.display = 'none';
             document.getElementById('tela-login').style.display = 'flex';
         }
         
-        calcularTotal();
-        carregarConfiguracoesSalvas(); 
-        document.body.offsetHeight; 
+        calcularSaldo();
+        document.body.offsetHeight; // Força redesenho
+        verificarAtalhos(); 
     }
 
+    // Dispara quando carrega e quando puxa do cache
     document.addEventListener('DOMContentLoaded', inicializarAppOffline);
     window.addEventListener('pageshow', function(event) { inicializarAppOffline(); });
-    window.addEventListener('popstate', function(event) { inicializarAppOffline(); }); 
-
-    function getDeviceID() {
-        let id = localStorage.getItem('wm_device_id');
-        if (!id) {
-            id = 'ID-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-            localStorage.setItem('wm_device_id', id);
-        }
-        return id;
-    }
-
-    function mascaraCPF(i){
-        var v = i.value.replace(/\D/g, "");
-        i.setAttribute("maxlength", "14");
-        if (v.length <= 11) {
-            v = v.replace(/(\d{3})(\d)/, "$1.$2");
-            v = v.replace(/(\d{3})(\d)/, "$1.$2");
-            v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-            i.value = v;
-        }
-    }
-
-    function mascaraMoeda(i) {
-        let v = i.value.replace(/\D/g, "");
-        if (v === "") { i.value = ""; return; }
-        v = (v / 100).toFixed(2) + "";
-        v = v.replace(".", ",");
-        v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
-        i.value = "R$ " + v;
-    }
-
-    function carregarConfiguracoesSalvas() {
-        let configs = JSON.parse(localStorage.getItem('wm_campos_salvos')) || {};
-        
-        ['nome', 'cpf', 'empresa', 'funcao', 'obra', 'restaurante'].forEach(campo => {
-            if (configs[campo] && configs[campo].salvar) {
-                document.getElementById('chk-' + campo).checked = true;
-                
-                if(campo === 'empresa' && configs.empresa.txt) {
-                    document.getElementById('empresa').value = 'Outra Empresa';
-                    document.getElementById('qual-empresa').value = configs.empresa.txt;
-                } else if(campo === 'obra' && configs.obra.txt) {
-                    document.getElementById('obra').value = 'Outra Obra';
-                    document.getElementById('qual-obra').value = configs.obra.txt;
-                } else if(campo === 'restaurante' && configs.restaurante.txt) {
-                    document.getElementById('restaurante').value = 'Outro Restaurante';
-                    document.getElementById('qual-restaurante').value = configs.restaurante.txt;
-                } else {
-                    document.getElementById(campo === 'nome' ? 'nome-completo' : campo).value = configs[campo].valor;
-                }
-            }
-        });
-
-        if (configs.precos && configs.precos.salvar) {
-            document.getElementById('chk-precos').checked = true;
-            document.getElementById('preco-cafe').value = configs.precos.cafe || '';
-            document.getElementById('preco-almoco').value = configs.precos.almoco || '';
-            document.getElementById('preco-jantar').value = configs.precos.jantar || '';
-        }
-
-        verificarCondicionais();
-    }
-
-    function gravarConfiguracoesSalvas() {
-        let configs = {};
-        let selEmpresa = document.getElementById('empresa').value;
-        let selObra = document.getElementById('obra').value;
-        let selRestaurante = document.getElementById('restaurante').value;
-
-        configs.nome = { salvar: document.getElementById('chk-nome').checked, valor: document.getElementById('nome-completo').value };
-        configs.cpf = { salvar: document.getElementById('chk-cpf').checked, valor: document.getElementById('cpf').value };
-        configs.empresa = { salvar: document.getElementById('chk-empresa').checked, valor: selEmpresa, txt: (selEmpresa === 'Outra Empresa' ? document.getElementById('qual-empresa').value : '') };
-        configs.funcao = { salvar: document.getElementById('chk-funcao').checked, valor: document.getElementById('funcao').value };
-        configs.obra = { salvar: document.getElementById('chk-obra').checked, valor: selObra, txt: (selObra === 'Outra Obra' ? document.getElementById('qual-obra').value : '') };
-        configs.restaurante = { salvar: document.getElementById('chk-restaurante').checked, valor: selRestaurante, txt: (selRestaurante === 'Outro Restaurante' ? document.getElementById('qual-restaurante').value : '') };
-        
-        configs.precos = { 
-            salvar: document.getElementById('chk-precos').checked, 
-            cafe: document.getElementById('preco-cafe').value,
-            almoco: document.getElementById('preco-almoco').value,
-            jantar: document.getElementById('preco-jantar').value
-        };
-
-        localStorage.setItem('wm_campos_salvos', JSON.stringify(configs));
-    }
+    // Vigia o botão de voltar do navegador/celular para forçar a tela de login
+    window.addEventListener('popstate', function(event) { inicializarAppOffline(); });
 
     async function gerarHash(texto) {
         const encoder = new TextEncoder();
         const data = encoder.encode(texto);
         const hashBuffer = await crypto.subtle.digest('SHA-256', data);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        return hashHex;
     }
 
     async function validarAcesso() {
         const senhaDigitada = document.getElementById('senha-input').value;
         const hashDigitado = await gerarHash(senhaDigitada);
-        
+
         if (hashDigitado === HASH_SENHA_MESTRA) {
-            localStorage.setItem('wm_refeicoes_sessao_ativa', 'true'); 
+            localStorage.setItem('wm_sessao_ativa', 'true');
             document.getElementById('tela-login').style.display = 'none';
-            document.getElementById('tela-principal').style.display = 'block'; 
-            document.getElementById('senha-input').value = '';
+            document.getElementById('tela-principal').style.display = 'block';
+            document.getElementById('senha-input').value = ''; 
             document.getElementById('erro-login').style.display = 'none';
         } else {
             document.getElementById('erro-login').style.display = 'block';
@@ -506,15 +435,22 @@
     function mostrarSenha() {
         let input = document.getElementById('senha-input');
         let icone = document.getElementById('icone-olho');
-        if (input.type === 'password') { input.type = 'text'; icone.src = 'OLHOABERTO.png'; } 
-        else { input.type = 'password'; icone.src = 'OLHOFECHADO_V2.png'; }
+        
+        if (input.type === 'password') {
+            input.type = 'text'; 
+            icone.src = 'OLHOABERTO.png'; 
+        } else {
+            input.type = 'password'; 
+            icone.src = 'OLHOFECHADO_V2.png'; 
+        }
     }
 
-    function salvarRascunhoSemSenha() {
-        localStorage.setItem('wm_refeicoes_sessao_ativa', 'true');
+    function salvarPausar() {
+        localStorage.setItem('wm_sessao_ativa', 'true');
         alert('✅ RASCUNHO SALVO COM SUCESSO');
     }
 
+    // --- FUNÇÕES DE MODAL DE SENHA PARA AÇÕES ---
     function solicitarSenhaAcao(acao) {
         acaoPendente = acao;
         document.getElementById('senha-acao-input').value = '';
@@ -522,7 +458,7 @@
         document.getElementById('modal-acao').style.display = 'flex';
 
         if(acao === 'encerrar') {
-            document.getElementById('texto-acao-modal').innerText = "Senha necessária para ENCERRAR A REFEIÇÃO";
+            document.getElementById('texto-acao-modal').innerText = "Senha necessária para ENCERRAR O CAIXINHA";
         }
     }
 
@@ -544,8 +480,9 @@
         
         if (hashDigitado === HASH_SENHA_MESTRA) {
             document.getElementById('modal-acao').style.display = 'none';
+            
             if (acaoPendente === 'encerrar') {
-                encerrarRelatorio();
+                encerrarCaixinha();
             }
             acaoPendente = '';
         } else {
@@ -553,42 +490,37 @@
         }
     }
 
-    let banco = JSON.parse(localStorage.getItem('wm_registros_refeicao')) || [];
+    document.getElementById('data').valueAsDate = new Date();
+    let banco = JSON.parse(localStorage.getItem('wm_despesas')) || [];
     let indiceEdicao = -1; 
 
-    function calcularTotal() {
-        document.getElementById('total-registros').innerText = banco.length + " Refeições Registradas";
+    function salvarCabecalho() {
+        localStorage.setItem('wm_num', document.getElementById('num-caixinha').value);
+        localStorage.setItem('wm_gestor', document.getElementById('nome-gestor').value);
+        localStorage.setItem('wm_anterior', document.getElementById('saldo-anterior').value);
+        calcularSaldo();
     }
 
-    function validarCPF(cpf) {
-        cpf = cpf.replace(/[^\d]+/g, ''); 
-        if (cpf == '') return false;
-        if (cpf.length != 11 || /^(\d)\1{10}$/.test(cpf)) return false; 
-        let add = 0, rev = 0;
-        for (let i = 0; i < 9; i++) add += parseInt(cpf.charAt(i)) * (10 - i);
-        rev = 11 - (add % 11);
-        if (rev == 10 || rev == 11) rev = 0;
-        if (rev != parseInt(cpf.charAt(9))) return false;
-        add = 0;
-        for (let i = 0; i < 10; i++) add += parseInt(cpf.charAt(i)) * (11 - i);
-        rev = 11 - (add % 11);
-        if (rev == 10 || rev == 11) rev = 0;
-        if (rev != parseInt(cpf.charAt(10))) return false;
-        return true;
-    }
+    function calcularSaldo() {
+        let inputAnterior = document.getElementById('saldo-anterior');
+        let ant = parseFloat(inputAnterior.value) || 0;
+        
+        if (ant >= 0) {
+            inputAnterior.className = "positivo";
+        } else {
+            inputAnterior.className = "negativo";
+        }
 
-    function verificarErroCPF() {
-        let cpfInput = document.getElementById('cpf').value;
-        if (cpfInput.replace(/\D/g, "").length >= 11) {
-            if (!validarCPF(cpfInput)) { document.getElementById('erro-cpf').style.display = 'block'; } 
-            else { document.getElementById('erro-cpf').style.display = 'none'; }
-        } else { document.getElementById('erro-cpf').style.display = 'none'; }
-    }
-
-    function verificarCondicionais() {
-        document.getElementById('div-qual-empresa').style.display = document.getElementById('empresa').value === 'Outra Empresa' ? 'block' : 'none';
-        document.getElementById('div-qual-obra').style.display = document.getElementById('obra').value === 'Outra Obra' ? 'block' : 'none';
-        document.getElementById('div-qual-restaurante').style.display = document.getElementById('restaurante').value === 'Outro Restaurante' ? 'block' : 'none';
+        let cred = banco.filter(i => i.categoria.includes('CRÉDITO')).reduce((s, i) => s + i.valor, 0);
+        let deb = banco.filter(i => !i.categoria.includes('CRÉDITO')).reduce((s, i) => s + i.valor, 0);
+        let total = ant + cred - deb;
+        
+        document.getElementById('total-creditos').innerText = cred.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        document.getElementById('total-gasto').innerText = deb.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        
+        let display = document.getElementById('saldo-atual-display');
+        display.innerText = "SALDO ATUAL: " + total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        display.className = total >= 0 ? "saldo-atual positivo" : "saldo-atual negativo";
     }
 
     function comprimirImagem(file) {
@@ -602,11 +534,17 @@
                 img.onload = function() {
                     let canvas = document.createElement('canvas');
                     let ctx = canvas.getContext('2d');
-                    let MAX_WIDTH = 600, MAX_HEIGHT = 600;
-                    let width = img.width, height = img.height;
-                    if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } 
-                    else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
-                    canvas.width = width; canvas.height = height;
+                    let MAX_WIDTH = 600;
+                    let MAX_HEIGHT = 600;
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > height) {
+                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                    } else {
+                        if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
                     ctx.drawImage(img, 0, 0, width, height);
                     resolve(canvas.toDataURL('image/jpeg', 0.6));
                 }
@@ -614,145 +552,102 @@
         });
     }
 
-    async function salvarRefeicao() {
-        let nome = document.getElementById('nome-completo').value;
-        let cpf = document.getElementById('cpf').value;
-        let selEmpresa = document.getElementById('empresa').value;
-        let txtEmpresa = document.getElementById('qual-empresa').value;
-        let txtFuncao = document.getElementById('funcao').value; 
-        let selObra = document.getElementById('obra').value;
-        let txtObra = document.getElementById('qual-obra').value;
-        let selRestaurante = document.getElementById('restaurante').value;
-        let txtRestaurante = document.getElementById('qual-restaurante').value;
-        let selRefeicao = document.getElementById('refeicao').value;
-
-        let valPreco = "R$ 0,00";
-        if (selRefeicao === "Café da manhã") valPreco = document.getElementById('preco-cafe').value || "R$ 0,00";
-        if (selRefeicao === "Almoço") valPreco = document.getElementById('preco-almoco').value || "R$ 0,00";
-        if (selRefeicao === "Jantar") valPreco = document.getElementById('preco-jantar').value || "R$ 0,00";
-
-        let fotoLocalInput = document.getElementById('foto-local').files[0];
-        let fotoAssinaturaInput = document.getElementById('foto-assinatura').files[0];
-
-        if(!nome || !cpf) return alert("⚠️ Atenção: Preencha Nome Completo e CPF!");
-        if(!validarCPF(cpf)) { document.getElementById('erro-cpf').style.display = 'block'; return alert("❌ CPF INVÁLIDO!!! Verifique o número digitado."); }
-        if (!selEmpresa || (selEmpresa === 'Outra Empresa' && !txtEmpresa)) return alert("⚠️ Informe a Empresa!");
-        if (!txtFuncao) return alert("⚠️ Informe a Função!");
-        if (!selObra || (selObra === 'Outra Obra' && !txtObra)) return alert("⚠️ Informe a Obra!");
-        if (!selRestaurante || (selRestaurante === 'Outro Restaurante' && !txtRestaurante)) return alert("⚠️ Informe o Restaurante!");
-        if (!selRefeicao) return alert("⚠️ Selecione a Refeição Atendida!");
+    async function salvarDespesa() {
+        let valor = parseFloat(document.getElementById('valor').value);
+        let desc = document.getElementById('desc').value;
+        let fornecedor = document.getElementById('fornecedor').value;
         
-        if (indiceEdicao < 0 && (!fotoLocalInput || !fotoAssinaturaInput)) {
-            return alert("⚠️ Atenção: As fotos do Local e da Assinatura são obrigatórias!");
+        if(!valor || !desc || !fornecedor) {
+            return alert("⚠️ Atenção: Preencha o Fornecedor, a Descrição e o Valor para salvar!");
         }
-
-        document.getElementById('btn-salvar-principal').innerText = "⏳ Salvando...";
-
-        let fLocal = await comprimirImagem(fotoLocalInput);
-        let fAssinatura = await comprimirImagem(fotoAssinaturaInput);
-
-        let dataAtual = new Date();
-        let dataFormatada = dataAtual.toLocaleDateString('pt-BR');
-        let horaFormatada = dataAtual.toLocaleTimeString('pt-BR');
+        
+        document.getElementById('btn-salvar-principal').innerText = "⏳ Processando...";
+        let fDoc = await comprimirImagem(document.getElementById('foto-doc').files[0]);
+        let fPag = await comprimirImagem(document.getElementById('foto-pagto').files[0]);
 
         let item = {
-            nome: nome, cpf: cpf,
-            empresa_sel: selEmpresa, empresa_txt: txtEmpresa,
-            funcao_txt: txtFuncao,
-            obra_sel: selObra, obra_txt: txtObra,
-            restaurante_sel: selRestaurante, restaurante_txt: txtRestaurante,
-            refeicao: selRefeicao,
-            preco: valPreco,
-            fotoLocal: fLocal, fotoAssinatura: fAssinatura,
-            dataReg: dataFormatada, horaReg: horaFormatada
+            categoria: document.getElementById('categoria').value,
+            data: document.getElementById('data').value.split('-').reverse().join('/'),
+            fornecedor: fornecedor,
+            descricao: desc,
+            valor: valor,
+            tipoDoc: document.getElementById('tipo-doc').value,
+            formaPagto: document.getElementById('forma-pagto').value,
+            fotoDoc: fDoc,
+            fotoPagto: fPag
         };
-
+        
         if (indiceEdicao >= 0) {
-            if (!item.fotoLocal) item.fotoLocal = banco[indiceEdicao].fotoLocal;
-            if (!item.fotoAssinatura) item.fotoAssinatura = banco[indiceEdicao].fotoAssinatura;
-            item.dataReg = banco[indiceEdicao].dataReg;
-            item.horaReg = banco[indiceEdicao].horaReg;
+            if (!item.fotoDoc) item.fotoDoc = banco[indiceEdicao].fotoDoc;
+            if (!item.fotoPagto) item.fotoPagto = banco[indiceEdicao].fotoPagto;
             banco[indiceEdicao] = item;
             indiceEdicao = -1; 
+            document.getElementById('btn-salvar-principal').innerText = "➕ Salvar na Lista";
         } else {
             banco.push(item);
         }
 
         try {
-            localStorage.setItem('wm_registros_refeicao', JSON.stringify(banco));
-            gravarConfiguracoesSalvas(); 
-
-            if(!document.getElementById('chk-nome').checked) document.getElementById('nome-completo').value = '';
-            if(!document.getElementById('chk-cpf').checked) document.getElementById('cpf').value = '';
-            if(!document.getElementById('chk-empresa').checked) { document.getElementById('empresa').value = ''; document.getElementById('qual-empresa').value = ''; }
-            if(!document.getElementById('chk-funcao').checked) document.getElementById('funcao').value = '';
-            if(!document.getElementById('chk-obra').checked) { document.getElementById('obra').value = ''; document.getElementById('qual-obra').value = ''; }
-            if(!document.getElementById('chk-restaurante').checked) { document.getElementById('restaurante').value = ''; document.getElementById('qual-restaurante').value = ''; }
-            
-            document.getElementById('refeicao').value = '';
-            document.getElementById('foto-local').value = ''; 
-            document.getElementById('foto-assinatura').value = ''; 
-
-            document.getElementById('btn-salvar-principal').innerText = "✅ Enviar (Salvar Registro)";
-            document.getElementById('erro-cpf').style.display = 'none';
-            calcularTotal(); 
-            verificarCondicionais();
-            alert("✔️ Registro Salvo com Sucesso!");
+            localStorage.setItem('wm_despesas', JSON.stringify(banco));
+            document.getElementById('desc').value = ''; 
+            document.getElementById('valor').value = ''; 
+            document.getElementById('fornecedor').value = '';
+            document.getElementById('foto-doc').value = ''; 
+            document.getElementById('foto-pagto').value = '';
+            document.getElementById('tipo-doc').selectedIndex = 0;
+            document.getElementById('forma-pagto').selectedIndex = 0;
+            document.getElementById('btn-salvar-principal').innerText = "➕ Salvar na Lista";
+            calcularSaldo(); 
+            alert("✔️ Lançamento Salvo!");
         } catch (e) {
-            alert("❌ Memória do celular cheia! Gere o PDF e limpe a ficha.");
-            document.getElementById('btn-salvar-principal').innerText = "✅ Enviar (Salvar Registro)";
+            alert("❌ Memória cheia! Exclua itens antigos ou encerre o caixinha.");
+            document.getElementById('btn-salvar-principal').innerText = "➕ Salvar na Lista";
         }
     }
 
     function abrirPlanilha() {
         document.getElementById('tela-principal').style.display = 'none';
         document.getElementById('tela-planilha').style.display = 'block';
+        
+        document.getElementById('print-num').innerText = document.getElementById('num-caixinha').value || "Não informado";
+        document.getElementById('print-gestor').innerText = document.getElementById('nome-gestor').value || "Não informado";
+        
+        let ant = parseFloat(document.getElementById('saldo-anterior').value) || 0;
+        let printAnterior = document.getElementById('print-anterior');
+        printAnterior.innerText = ant.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        printAnterior.className = ant >= 0 ? "positivo" : "negativo";
 
-        document.getElementById('print-total').innerText = banco.length;
-        document.getElementById('print-data-emissao').innerText = "Emitido: " + new Date().toLocaleDateString() + " às " + new Date().toLocaleTimeString();
-        document.getElementById('print-device-id').innerText = "Aparelho ID: " + getDeviceID();
+        document.getElementById('print-creditos').innerText = document.getElementById('total-creditos').innerText;
+        document.getElementById('print-debitos').innerText = document.getElementById('total-gasto').innerText;
+        
+        let displayAtual = document.getElementById('saldo-atual-display');
+        let printFinal = document.getElementById('print-final');
+        printFinal.innerText = displayAtual.innerText.replace("SALDO ATUAL: ","");
+        printFinal.className = displayAtual.className.includes('positivo') ? "positivo" : "negativo";
+        
+        document.getElementById('print-data-emissao').innerText = "Emitido em: " + new Date().toLocaleDateString() + " às " + new Date().toLocaleTimeString();
 
         let corpo = document.getElementById('corpo-tabela'); 
         corpo.innerHTML = "";
-        let somaTotal = 0;
-
         banco.forEach((item, index) => {
-            let fotosHTML = `<div style="display:flex; flex-direction:row; gap:5px; justify-content:center;">`;
-            if(item.fotoLocal) fotosHTML += `<div class="anexo-box"><span class="legenda-foto">Local</span><img src="${item.fotoLocal}" class="foto-miniatura" onclick="verFoto('${item.fotoLocal}')"></div>`;
-            if(item.fotoAssinatura) fotosHTML += `<div class="anexo-box"><span class="legenda-foto">Assin.</span><img src="${item.fotoAssinatura}" class="foto-miniatura" onclick="verFoto('${item.fotoAssinatura}')"></div>`;
-            fotosHTML += `</div>`;
-
-            let displayEmpresa = item.empresa_sel === 'Outra Empresa' ? item.empresa_txt : item.empresa_sel;
-            let displayObra = item.obra_sel === 'Outra Obra' ? item.obra_txt : item.obra_sel;
-            let displayRestaurante = item.restaurante_sel === 'Outro Restaurante' ? item.restaurante_txt : item.restaurante_sel;
+            let fHTML = `<div style="display:flex; flex-direction:row; gap:10px; justify-content:center; align-items:flex-start;">`;
+            if(item.fotoDoc) fHTML += `<div class="anexo-box"><span class="legenda-foto">${item.tipoDoc}</span><img src="${item.fotoDoc}" class="foto-miniatura" onclick="verFoto('${item.fotoDoc}')"></div>`;
+            if(item.fotoPagto) fHTML += `<div class="anexo-box"><span class="legenda-foto">${item.formaPagto}</span><img src="${item.fotoPagto}" class="foto-miniatura" onclick="verFoto('${item.fotoPagto}')"></div>`;
+            fHTML += `</div>`;
             
-            let valorNumerico = parseFloat(item.preco.replace('R$ ', '').replace('.', '').replace(',', '.')) || 0;
-            somaTotal += valorNumerico;
-
-            // INSERÇÃO DAS COLUNAS INDIVIDUAIS (Estilo Excel)
             corpo.innerHTML += `<tr>
-                <td>${item.dataReg}</td>
-                <td><b>${item.horaReg}</b></td>
-                <td style="text-align:left;"><b>${item.nome}</b></td>
-                <td>${item.cpf}</td>
-                <td>${displayEmpresa}</td>
-                <td>${item.funcao_txt}</td>
-                <td>${displayObra}</td>
-                <td style="color:#f39c12;"><b>${displayRestaurante}</b></td>
-                <td><b>${item.refeicao}</b></td>
-                <td style="color:green; font-weight:bold;">${item.preco}</td>
-                <td>${fotosHTML}</td>
-                <td>
-                    <div style="display:flex; gap:5px; justify-content:center;">
-                        <button onclick="editar(${index})" style="background:orange; color:white; border:none; padding:8px; border-radius:3px; cursor:pointer; width:100%;">✏️ Editar</button>
-                        <button onclick="excluir(${index})" style="background:red; color:white; border:none; padding:8px; border-radius:3px; cursor:pointer; width:100%;">🗑️ Excluir</button>
-                    </div>
+                <td>${item.categoria}</td>
+                <td>${item.data}</td>
+                <td>${item.fornecedor}</td>
+                <td>${item.descricao}</td>
+                <td style="white-space:nowrap; font-weight:bold;">R$ ${item.valor.toFixed(2)}</td>
+                <td>${fHTML || '---'}</td>
+                <td style="text-align:center;">
+                    <button onclick="editar(${index})" style="background:orange; color:white; border:none; padding:8px; border-radius:3px; cursor:pointer; margin-bottom:5px; width: 100%;">✏️ Editar</button>
+                    <button onclick="excluir(${index})" style="background:red; color:white; border:none; padding:8px; border-radius:3px; cursor:pointer; width: 100%;">🗑️ Excluir</button>
                 </td>
             </tr>`;
         });
-        
-        let totalFormatado = somaTotal.toFixed(2).replace('.', ',');
-        document.getElementById('print-valor-total').innerText = "R$ " + totalFormatado.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
     }
 
     function voltarParaFormulario() { document.getElementById('tela-planilha').style.display = 'none'; document.getElementById('tela-principal').style.display = 'block'; }
@@ -760,73 +655,63 @@
 
     function editar(index) {
         let it = banco[index];
-        document.getElementById('nome-completo').value = it.nome;
-        document.getElementById('cpf').value = it.cpf;
-        document.getElementById('empresa').value = it.empresa_sel;
-        document.getElementById('qual-empresa').value = it.empresa_txt || '';
-        document.getElementById('funcao').value = it.funcao_txt || '';
-        document.getElementById('obra').value = it.obra_sel;
-        document.getElementById('qual-obra').value = it.obra_txt || '';
-        document.getElementById('restaurante').value = it.restaurante_sel || '';
-        document.getElementById('qual-restaurante').value = it.restaurante_txt || '';
-        document.getElementById('refeicao').value = it.refeicao;
-        verificarCondicionais();
-        document.getElementById('erro-cpf').style.display = 'none';
+        document.getElementById('categoria').value = it.categoria;
+        document.getElementById('data').value = it.data.split('/').reverse().join('-');
+        document.getElementById('fornecedor').value = it.fornecedor;
+        document.getElementById('desc').value = it.descricao;
+        document.getElementById('valor').value = it.valor;
+        document.getElementById('tipo-doc').value = it.tipoDoc;
+        document.getElementById('forma-pagto').value = it.formaPagto;
         indiceEdicao = index;
-        document.getElementById('btn-salvar-principal').innerText = "💾 Atualizar Registro";
+        document.getElementById('btn-salvar-principal').innerText = "💾 Atualizar Lançamento";
         voltarParaFormulario();
     }
 
-    function excluir(index) { if(confirm("Excluir definitivamente?")) { banco.splice(index,1); localStorage.setItem('wm_registros_refeicao', JSON.stringify(banco)); abrirPlanilha(); calcularTotal(); } }
+    function excluir(index) { if(confirm("Excluir definitivamente?")) { banco.splice(index,1); localStorage.setItem('wm_despesas', JSON.stringify(banco)); abrirPlanilha(); calcularSaldo(); } }
     function gerarPDF() { abrirPlanilha(); setTimeout(() => { window.print(); }, 1500); }
 
-    function encerrarRelatorio() { 
-        if(confirm("Apagar toda a ficha do aparelho? Faça isso apenas DEPOIS de gerar e enviar o PDF!")) { 
+    // ==========================================
+    // ENCERRAMENTO 100% OFFLINE E SEGURO
+    // ==========================================
+    function encerrarCaixinha() { 
+        if(confirm("Zerar tudo? Você perderá todos os dados não enviados!")) { 
             
-            // 1. Apaga APENAS os dados de Refeições da memória (Protege o Caixinha!)
-            localStorage.removeItem('wm_registros_refeicao');
-            localStorage.removeItem('wm_campos_salvos'); 
-            localStorage.removeItem('wm_refeicoes_sessao_ativa'); 
+            // 1. Apaga APENAS os dados do Caixinha da memória
+            localStorage.removeItem('wm_despesas'); 
+            localStorage.removeItem('wm_sessao_ativa'); 
+            localStorage.removeItem('wm_num');
+            localStorage.removeItem('wm_gestor');
+            localStorage.removeItem('wm_anterior');
             
+            // 2. Limpa variáveis e tabelas visualmente
             banco = [];
             indiceEdicao = -1;
-            calcularTotal();
             document.getElementById('corpo-tabela').innerHTML = "";
 
-            document.getElementById('nome-completo').value = '';
-            document.getElementById('cpf').value = '';
-            document.getElementById('empresa').value = '';
-            document.getElementById('qual-empresa').value = '';
-            document.getElementById('funcao').value = '';
-            document.getElementById('obra').value = '';
-            document.getElementById('qual-obra').value = '';
-            document.getElementById('restaurante').value = '';
-            document.getElementById('qual-restaurante').value = '';
-            document.getElementById('refeicao').value = '';
-            document.getElementById('foto-local').value = ''; 
-            document.getElementById('foto-assinatura').value = ''; 
+            // 3. Zera os campos da tela
+            document.getElementById('num-caixinha').value = '';
+            document.getElementById('nome-gestor').value = '';
+            document.getElementById('saldo-anterior').value = '';
+            document.getElementById('desc').value = ''; 
+            document.getElementById('valor').value = ''; 
+            document.getElementById('fornecedor').value = '';
+            document.getElementById('foto-doc').value = ''; 
+            document.getElementById('foto-pagto').value = '';
+            document.getElementById('tipo-doc').selectedIndex = 0;
+            document.getElementById('forma-pagto').selectedIndex = 0;
 
-            document.getElementById('chk-nome').checked = false;
-            document.getElementById('chk-cpf').checked = false;
-            document.getElementById('chk-empresa').checked = false;
-            document.getElementById('chk-funcao').checked = false;
-            document.getElementById('chk-obra').checked = false;
-            document.getElementById('chk-restaurante').checked = false;
-            document.getElementById('chk-precos').checked = false;
+            calcularSaldo();
             
-            document.getElementById('preco-cafe').value = '';
-            document.getElementById('preco-almoco').value = '';
-            document.getElementById('preco-jantar').value = '';
-            verificarCondicionais();
-            
+            // 4. Esconde as telas e volta pro login na mesma hora
             document.getElementById('tela-principal').style.display = 'none';
             document.getElementById('tela-planilha').style.display = 'none';
             document.getElementById('tela-login').style.display = 'flex';
             
+            // 5. Zera a senha
             document.getElementById('senha-input').value = '';
             document.getElementById('erro-login').style.display = 'none';
             
-            alert("✅ Relatório encerrado, dados e sessão apagados com sucesso!");
+            alert("✅ Caixinha encerrado, dados e sessão apagados com sucesso!");
         } 
     }
 
@@ -839,19 +724,26 @@
                 try {
                     const nomesCaches = await caches.keys();
                     await Promise.all(nomesCaches.map(nome => {
-                        if (nome.startsWith('refeicoes-wm-')) return caches.delete(nome);
+                        // Apaga SOMENTE o cache do Caixinha para forçar o download novo
+                        if (nome.startsWith('caixinha-wm-')) return caches.delete(nome);
                     }));
                 } catch (e) {
                     console.error("Erro ao limpar o cache isolado:", e);
                 }
             }
+            // Recarrega a página forçando ignorar o cache antigo no navegador
             window.location.href = window.location.pathname + '?atualizar=' + new Date().getTime();
         }
     }
 
+    document.getElementById('num-caixinha').value = localStorage.getItem('wm_num') || '';
+    document.getElementById('nome-gestor').value = localStorage.getItem('wm_gestor') || '';
+    document.getElementById('saldo-anterior').value = localStorage.getItem('wm_anterior') || '';
+    calcularSaldo();
+
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js').then(reg => {
-            reg.update(); 
+            reg.update();
             reg.onupdatefound = () => {
                 const novoWorker = reg.installing;
                 novoWorker.onstatechange = () => {
@@ -866,7 +758,7 @@
         
         document.addEventListener("visibilitychange", () => {
             if (document.visibilityState === "visible") {
-                document.body.offsetHeight; 
+                document.body.offsetHeight; // Força redesenho
                 if (navigator.serviceWorker) {
                     navigator.serviceWorker.ready.then(reg => reg.update());
                 }
