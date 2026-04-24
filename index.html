@@ -756,24 +756,58 @@
 
     function gerarPDF() { abrirPlanilha(); setTimeout(() => { window.print(); }, 1500); }
 
+    // NOVA FUNÇÃO DE ENCERRAMENTO (100% OFF-LINE)
     function encerrarRelatorio() { 
         if(confirm("Apagar toda a ficha do aparelho? Faça isso apenas DEPOIS de gerar e enviar o PDF!")) { 
+            
+            // 1. Apaga os dados do banco de dados local do celular
             localStorage.removeItem('wm_registros_refeicao');
             localStorage.removeItem('wm_campos_salvos'); 
-            localStorage.removeItem('acesso_refeicoes_concedido');
             
-            if ('serviceWorker' in navigator) {
-                caches.keys().then(function(names) {
-                    for (let name of names) caches.delete(name);
-                });
-                navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                    for(let registration of registrations) {
-                        registration.unregister();
-                    }
-                });
-            }
+            // 2. Limpa as variáveis da memória ativa do app
+            banco = [];
+            indiceEdicao = -1;
+            calcularTotal();
+            document.getElementById('corpo-tabela').innerHTML = "";
+
+            // 3. Limpa os campos visíveis do formulário e zera checkboxes
+            document.getElementById('nome-completo').value = '';
+            document.getElementById('cpf').value = '';
+            document.getElementById('empresa').value = '';
+            document.getElementById('qual-empresa').value = '';
+            document.getElementById('funcao').value = '';
+            document.getElementById('obra').value = '';
+            document.getElementById('qual-obra').value = '';
+            document.getElementById('restaurante').value = '';
+            document.getElementById('qual-restaurante').value = '';
+            document.getElementById('refeicao').value = '';
+            document.getElementById('foto-local').value = ''; 
+            document.getElementById('foto-assinatura').value = ''; 
+
+            document.getElementById('chk-nome').checked = false;
+            document.getElementById('chk-cpf').checked = false;
+            document.getElementById('chk-empresa').checked = false;
+            document.getElementById('chk-funcao').checked = false;
+            document.getElementById('chk-obra').checked = false;
+            document.getElementById('chk-restaurante').checked = false;
+            document.getElementById('chk-precos').checked = false;
             
-            window.location.href = window.location.pathname + '?atualizar=' + new Date().getTime();
+            document.getElementById('preco-cafe').value = '';
+            document.getElementById('preco-almoco').value = '';
+            document.getElementById('preco-jantar').value = '';
+
+            verificarCondicionais();
+            
+            // 4. Esconde as telas do app e mostra a tela de LOGIN (ACESSO RESTRITO)
+            document.getElementById('tela-principal').style.display = 'none';
+            document.getElementById('tela-planilha').style.display = 'none';
+            document.getElementById('tela-login').style.display = 'flex';
+            
+            // 5. Zera o campo de senha para exigir nova digitação
+            document.getElementById('senha-input').value = '';
+            document.getElementById('erro-login').style.display = 'none';
+            
+            alert("✅ Caixinha encerrado e dados apagados com sucesso!");
         } 
     }
 
