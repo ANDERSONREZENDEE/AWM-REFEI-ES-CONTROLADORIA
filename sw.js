@@ -1,5 +1,5 @@
 const PREFIXO_CACHE = 'refeicoes-wm-';
-const CACHE_NAME = PREFIXO_CACHE + 'v4'; 
+const CACHE_NAME = PREFIXO_CACHE + 'v5'; // Atualizado para v5 para forçar a mudança
 
 // Arquivos principais para guardar offline imediatamente
 const arquivosParaGuardar = [
@@ -56,7 +56,8 @@ self.addEventListener('fetch', evento => {
         });
       }).catch(() => {
         if (evento.request.mode === 'navigate') {
-          return caches.match(evento.request.url, { ignoreSearch: true });
+          // ✅ CORREÇÃO APLICADA AQUI: Redireciona direto para o index
+          return caches.match('./index.html', { ignoreSearch: true });
         }
       })
   );
