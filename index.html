@@ -302,7 +302,7 @@
         </div>
 
         <div class="area-acoes">
-            <button class="btn-pausar" onclick="solicitarSenhaAcao('rascunho')">💾 SALVAR O RASCUNHO</button>
+            <button class="btn-pausar" onclick="salvarRascunhoSemSenha()">💾 SALVAR O RASCUNHO</button>
             <button class="btn-whats" onclick="gerarPDF()">📲 GERAR RELATÓRIO PDF</button>
             <button class="btn-encerrar" onclick="solicitarSenhaAcao('encerrar')">🏁 ENCERRAR O CAIXINHA</button>
         </div>
@@ -360,17 +360,26 @@
     let acaoPendente = '';
 
     // ==========================================
-    // INICIALIZAÇÃO ROBUSTA (Evita travamentos de cache PWA)
+    // INICIALIZAÇÃO ROBUSTA (Verifica se a sessão está salva)
     // ==========================================
     function inicializarAppOffline() {
-        if (document.getElementById('tela-principal').style.display !== 'block' && document.getElementById('tela-planilha').style.display !== 'block') {
-            document.getElementById('tela-login').style.display = 'flex';
+        // Se a sessão já estiver ativa (senha salva), pula a tela de login
+        if (localStorage.getItem('wm_sessao_ativa') === 'true') {
+            document.getElementById('tela-login').style.display = 'none';
+            // Garante que só mostre o formulário se a planilha não estiver aberta
+            if (document.getElementById('tela-planilha').style.display !== 'block') {
+                document.getElementById('tela-principal').style.display = 'block';
+            }
+        } else {
+            // Se não tem sessão salva, exige o login
+            if (document.getElementById('tela-principal').style.display !== 'block' && document.getElementById('tela-planilha').style.display !== 'block') {
+                document.getElementById('tela-login').style.display = 'flex';
+            }
         }
+        
         calcularTotal();
         carregarConfiguracoesSalvas(); 
-        
-        // Truque para forçar o navegador a redesenhar a tela
-        document.body.offsetHeight; 
+        document.body.offsetHeight; // Força redesenho
     }
 
     document.addEventListener('DOMContentLoaded', inicializarAppOffline);
@@ -483,12 +492,11 @@
         const hashDigitado = await gerarHash(senhaDigitada);
         
         if (hashDigitado === HASH_SENHA_MESTRA) {
+            // SALVA A SESSÃO DO USUÁRIO (Lembrar a senha no celular)
+            localStorage.setItem('wm_sessao_ativa', 'true'); 
+            
             document.getElementById('tela-login').style.display = 'none';
-            
-            // >>> CORREÇÃO DO BUG AQUI <<<
-            // Antes a tela principal continuava invisível. Agora forçamos ela a aparecer!
             document.getElementById('tela-principal').style.display = 'block'; 
-            
             document.getElementById('senha-input').value = '';
             document.getElementById('erro-login').style.display = 'none';
         } else {
@@ -503,6 +511,13 @@
         else { input.type = 'password'; icone.src = 'OLHOFECHADO_V2.png'; }
     }
 
+    // --- NOVA FUNÇÃO PARA SALVAR RASCUNHO SEM PEDIR SENHA ---
+    function salvarRascunhoSemSenha() {
+        // Garante que a sessão continue salva
+        localStorage.setItem('wm_sessao_ativa', 'true');
+        alert('✅ Rascunho salvo!\n\nOs dados estão garantidos e a sua senha está salva neste aparelho. Você não precisará logar de novo se fechar e reabrir o app.');
+    }
+
     // --- FUNÇÕES DE SENHA (AÇÕES RESTRITAS - MODO OFFLINE) ---
     function solicitarSenhaAcao(acao) {
         acaoPendente = acao;
@@ -512,8 +527,6 @@
 
         if(acao === 'encerrar') {
             document.getElementById('texto-acao-modal').innerText = "Senha necessária para ENCERRAR O CAIXINHA";
-        } else {
-            document.getElementById('texto-acao-modal').innerText = "Senha necessária para SALVAR O RASCUNHO";
         }
     }
 
@@ -539,8 +552,6 @@
             // Executa a ação pendente
             if (acaoPendente === 'encerrar') {
                 encerrarRelatorio();
-            } else if (acaoPendente === 'rascunho') {
-                alert('✅ Rascunho salvo! Os dados estão garantidos no seu celular.');
             }
             acaoPendente = '';
         } else {
@@ -621,7 +632,6 @@
         let txtRestaurante = document.getElementById('qual-restaurante').value;
         let selRefeicao = document.getElementById('refeicao').value;
 
-        // Pega o valor correspondente à refeição selecionada
         let valPreco = "R$ 0,00";
         if (selRefeicao === "Café da manhã") valPreco = document.getElementById('preco-cafe').value || "R$ 0,00";
         if (selRefeicao === "Almoço") valPreco = document.getElementById('preco-almoco').value || "R$ 0,00";
@@ -678,7 +688,6 @@
             localStorage.setItem('wm_registros_refeicao', JSON.stringify(banco));
             gravarConfiguracoesSalvas(); 
 
-            // Limpa os campos não salvos
             if(!document.getElementById('chk-nome').checked) document.getElementById('nome-completo').value = '';
             if(!document.getElementById('chk-cpf').checked) document.getElementById('cpf').value = '';
             if(!document.getElementById('chk-empresa').checked) { document.getElementById('empresa').value = ''; document.getElementById('qual-empresa').value = ''; }
@@ -785,6 +794,9 @@
             localStorage.removeItem('wm_registros_refeicao');
             localStorage.removeItem('wm_campos_salvos'); 
             
+            // APAGA A SESSÃO DO USUÁRIO - O PRÓXIMO ACESSO VAI PEDIR SENHA DE NOVO
+            localStorage.removeItem('wm_sessao_ativa'); 
+            
             banco = [];
             indiceEdicao = -1;
             calcularTotal();
@@ -824,7 +836,7 @@
             document.getElementById('senha-input').value = '';
             document.getElementById('erro-login').style.display = 'none';
             
-            alert("✅ Caixinha encerrado e dados apagados com sucesso!");
+            alert("✅ Caixinha encerrado, dados e sessão de acesso apagados com sucesso!");
         } 
     }
 
@@ -848,7 +860,6 @@
             console.log("Erro no Service Worker:", err);
         });
         
-        // TRUQUE ADICIONAL PARA RE-RENDERIZAR A TELA AO VOLTAR DO MINIMIZADO
         document.addEventListener("visibilitychange", () => {
             if (document.visibilityState === "visible") {
                 document.body.offsetHeight; // Força redesenho
