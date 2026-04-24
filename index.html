@@ -31,7 +31,10 @@
             --fundo: #f4f7f6;
         }
 
-        body { font-family: Arial, sans-serif; background-color: #ccc; margin: 0; display: flex; justify-content: center; padding: 10px; }
+        body { 
+            font-family: Arial, sans-serif; background-color: #ccc; margin: 0; display: flex; justify-content: center; padding: 10px; 
+            -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; -webkit-touch-callout: none;
+        }
 
         input, select, textarea {
             box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; width: 100%; padding: 10px; margin-top: 3px;
@@ -103,14 +106,15 @@
         #modal-foto { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; }
         #foto-ampliada { max-width: 90%; max-height: 80%; border: 3px solid white; pointer-events: none; }
 
-        #tela-login {
+        #tela-login, #modal-acao {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--azul-wm); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
+        #modal-acao { background: rgba(26, 35, 58, 0.9); display: none; }
         .login-box { background: white; padding: 25px; border-radius: 10px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         .login-box img { max-height: 60px; margin-bottom: 10px; object-fit: contain; pointer-events: none; }
     </style>
 </head>
-<body>
+<body ondragstart="return false;" ondrop="return false;">
 
 <div id="tela-login">
     <div class="login-box">
@@ -128,7 +132,7 @@
     </div>
 </div>
 
-<div id="modal-acao" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 35, 58, 0.9); z-index: 9999; justify-content: center; align-items: center; flex-direction: column;">
+<div id="modal-acao">
     <div class="login-box">
         <img src="LOGOTIPO.jpg" alt="Logo WM">
         <h3 style="color: var(--azul-wm); margin-top: 0; margin-bottom: 5px;">ACESSO RESTRITO</h3>
@@ -148,7 +152,7 @@
 </div>
 
 <div class="app-container">
-    <div id="tela-principal">
+    <div id="tela-principal" style="display:none;">
         <header>
             <div class="logos-container">
                 <img src="LOGOTIPO.jpg" alt="WM" class="logo-wm">
@@ -356,39 +360,32 @@
     const _s = [53, 52, 52, 102, 55, 55, 97, 49, 102, 50, 50, 97, 51, 53, 50, 99, 52, 49, 54, 48, 56, 53, 56, 98, 50, 100, 55, 56, 55, 99, 98, 97, 57, 53, 55, 54, 98, 101, 54, 100, 55, 48, 98, 48, 101, 100, 53, 51, 98, 55, 52, 97, 56, 49, 51, 57, 99, 97, 56, 54, 49, 97, 54, 49];
     const HASH_SENHA_MESTRA = String.fromCharCode(..._s);
 
-    // Variável para armazenar qual ação o usuário quer fazer após digitar a senha
     let acaoPendente = '';
 
     // ==========================================
-    // INICIALIZAÇÃO ROBUSTA (Verifica se a sessão está salva)
+    // INICIALIZAÇÃO ROBUSTA E SESSÃO ISOLADA
     // ==========================================
     function inicializarAppOffline() {
-        // Se a sessão já estiver ativa (senha salva), pula a tela de login
-        if (localStorage.getItem('wm_sessao_ativa') === 'true') {
+        // Usando chave ESPECÍFICA de Refeições para não dar conflito com o Caixinha
+        if (localStorage.getItem('wm_refeicoes_sessao_ativa') === 'true') {
             document.getElementById('tela-login').style.display = 'none';
-            // Garante que só mostre o formulário se a planilha não estiver aberta
             if (document.getElementById('tela-planilha').style.display !== 'block') {
                 document.getElementById('tela-principal').style.display = 'block';
             }
         } else {
-            // Se não tem sessão salva, exige o login
-            if (document.getElementById('tela-principal').style.display !== 'block' && document.getElementById('tela-planilha').style.display !== 'block') {
-                document.getElementById('tela-login').style.display = 'flex';
-            }
+            document.getElementById('tela-principal').style.display = 'none';
+            document.getElementById('tela-planilha').style.display = 'none';
+            document.getElementById('tela-login').style.display = 'flex';
         }
         
         calcularTotal();
         carregarConfiguracoesSalvas(); 
-        document.body.offsetHeight; // Força redesenho
+        document.body.offsetHeight; 
     }
 
     document.addEventListener('DOMContentLoaded', inicializarAppOffline);
-
-    window.addEventListener('pageshow', function(event) {
-        if (event.persisted) {
-            inicializarAppOffline();
-        }
-    });
+    window.addEventListener('pageshow', function(event) { inicializarAppOffline(); });
+    window.addEventListener('popstate', function(event) { inicializarAppOffline(); }); // Vigia o botão de voltar
 
     function getDeviceID() {
         let id = localStorage.getItem('wm_device_id');
@@ -412,10 +409,7 @@
 
     function mascaraMoeda(i) {
         let v = i.value.replace(/\D/g, "");
-        if (v === "") {
-            i.value = "";
-            return;
-        }
+        if (v === "") { i.value = ""; return; }
         v = (v / 100).toFixed(2) + "";
         v = v.replace(".", ",");
         v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
@@ -456,7 +450,6 @@
 
     function gravarConfiguracoesSalvas() {
         let configs = {};
-        
         let selEmpresa = document.getElementById('empresa').value;
         let selObra = document.getElementById('obra').value;
         let selRestaurante = document.getElementById('restaurante').value;
@@ -486,15 +479,12 @@
         return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
-    // --- FUNÇÕES DE SENHA (LOGIN PRINCIPAL) ---
     async function validarAcesso() {
         const senhaDigitada = document.getElementById('senha-input').value;
         const hashDigitado = await gerarHash(senhaDigitada);
         
         if (hashDigitado === HASH_SENHA_MESTRA) {
-            // SALVA A SESSÃO DO USUÁRIO (Lembrar a senha no celular)
-            localStorage.setItem('wm_sessao_ativa', 'true'); 
-            
+            localStorage.setItem('wm_refeicoes_sessao_ativa', 'true'); 
             document.getElementById('tela-login').style.display = 'none';
             document.getElementById('tela-principal').style.display = 'block'; 
             document.getElementById('senha-input').value = '';
@@ -511,14 +501,11 @@
         else { input.type = 'password'; icone.src = 'OLHOFECHADO_V2.png'; }
     }
 
-    // --- NOVA FUNÇÃO PARA SALVAR RASCUNHO SEM PEDIR SENHA ---
     function salvarRascunhoSemSenha() {
-        // Garante que a sessão continue salva
-        localStorage.setItem('wm_sessao_ativa', 'true');
-        alert('✅ Rascunho salvo!\n\nOs dados estão garantidos e a sua senha está salva neste aparelho. Você não precisará logar de novo se fechar e reabrir o app.');
+        localStorage.setItem('wm_refeicoes_sessao_ativa', 'true');
+        alert('✅ RASCUNHO SALVO COM SUCESSO');
     }
 
-    // --- FUNÇÕES DE SENHA (AÇÕES RESTRITAS - MODO OFFLINE) ---
     function solicitarSenhaAcao(acao) {
         acaoPendente = acao;
         document.getElementById('senha-acao-input').value = '';
@@ -548,8 +535,6 @@
         
         if (hashDigitado === HASH_SENHA_MESTRA) {
             document.getElementById('modal-acao').style.display = 'none';
-            
-            // Executa a ação pendente
             if (acaoPendente === 'encerrar') {
                 encerrarRelatorio();
             }
@@ -761,47 +746,42 @@
         let it = banco[index];
         document.getElementById('nome-completo').value = it.nome;
         document.getElementById('cpf').value = it.cpf;
-        
         document.getElementById('empresa').value = it.empresa_sel;
         document.getElementById('qual-empresa').value = it.empresa_txt || '';
-        
         document.getElementById('funcao').value = it.funcao_txt || '';
-        
         document.getElementById('obra').value = it.obra_sel;
         document.getElementById('qual-obra').value = it.obra_txt || '';
-
         document.getElementById('restaurante').value = it.restaurante_sel || '';
         document.getElementById('qual-restaurante').value = it.restaurante_txt || '';
-        
         document.getElementById('refeicao').value = it.refeicao;
-
         verificarCondicionais();
         document.getElementById('erro-cpf').style.display = 'none';
-
         indiceEdicao = index;
         document.getElementById('btn-salvar-principal').innerText = "💾 Atualizar Registro";
         voltarParaFormulario();
     }
 
     function excluir(index) { if(confirm("Excluir definitivamente?")) { banco.splice(index,1); localStorage.setItem('wm_registros_refeicao', JSON.stringify(banco)); abrirPlanilha(); calcularTotal(); } }
-
     function gerarPDF() { abrirPlanilha(); setTimeout(() => { window.print(); }, 1500); }
 
-    // ENCERRAMENTO (100% OFF-LINE)
+    // ==========================================
+    // ENCERRAMENTO 100% OFFLINE E SEGURO
+    // ==========================================
     function encerrarRelatorio() { 
         if(confirm("Apagar toda a ficha do aparelho? Faça isso apenas DEPOIS de gerar e enviar o PDF!")) { 
             
+            // 1. Apaga APENAS os dados de Refeições da memória (Protege o Caixinha!)
             localStorage.removeItem('wm_registros_refeicao');
             localStorage.removeItem('wm_campos_salvos'); 
+            localStorage.removeItem('wm_refeicoes_sessao_ativa'); 
             
-            // APAGA A SESSÃO DO USUÁRIO - O PRÓXIMO ACESSO VAI PEDIR SENHA DE NOVO
-            localStorage.removeItem('wm_sessao_ativa'); 
-            
+            // 2. Limpa variáveis e tabelas visualmente
             banco = [];
             indiceEdicao = -1;
             calcularTotal();
             document.getElementById('corpo-tabela').innerHTML = "";
 
+            // 3. Zera os campos da tela
             document.getElementById('nome-completo').value = '';
             document.getElementById('cpf').value = '';
             document.getElementById('empresa').value = '';
@@ -826,17 +806,18 @@
             document.getElementById('preco-cafe').value = '';
             document.getElementById('preco-almoco').value = '';
             document.getElementById('preco-jantar').value = '';
-
             verificarCondicionais();
             
+            // 4. Esconde as telas e volta pro login na mesma hora
             document.getElementById('tela-principal').style.display = 'none';
             document.getElementById('tela-planilha').style.display = 'none';
             document.getElementById('tela-login').style.display = 'flex';
             
+            // 5. Zera a senha
             document.getElementById('senha-input').value = '';
             document.getElementById('erro-login').style.display = 'none';
             
-            alert("✅ Caixinha encerrado, dados e sessão de acesso apagados com sucesso!");
+            alert("✅ Relatório encerrado, dados e sessão apagados com sucesso!");
         } 
     }
 
@@ -848,11 +829,8 @@
                 novoWorker.onstatechange = () => {
                     if (novoWorker.state === 'installed' && navigator.serviceWorker.controller) {
                         console.log("Nova versão detectada! Atualizando app silenciosamente...");
-                        caches.keys().then(keys => {
-                            Promise.all(keys.map(key => caches.delete(key))).then(() => {
-                                window.location.reload(true);
-                            });
-                        });
+                        // Substituído o trator de apagar caches por apenas um reload seguro
+                        window.location.reload(true);
                     }
                 };
             };
