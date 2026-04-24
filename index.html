@@ -308,7 +308,8 @@
         <div class="area-acoes">
             <button class="btn-pausar" onclick="salvarRascunhoSemSenha()">💾 SALVAR O RASCUNHO</button>
             <button class="btn-whats" onclick="gerarPDF()">📲 GERAR RELATÓRIO PDF</button>
-            <button class="btn-encerrar" onclick="solicitarSenhaAcao('encerrar')">🏁 ENCERRAR O CAIXINHA</button>
+            <button class="btn-encerrar" onclick="solicitarSenhaAcao('encerrar')">🏁 ENCERRAR A REFEIÇÃO</button>
+            <button class="btn-whats" onclick="atualizarAppSeguro()" style="background-color: #34495e; margin-top: 5px;">🔄 ATUALIZAR APLICATIVO</button>
         </div>
     </div>
 
@@ -366,7 +367,6 @@
     // INICIALIZAÇÃO ROBUSTA E SESSÃO ISOLADA
     // ==========================================
     function inicializarAppOffline() {
-        // Usando chave ESPECÍFICA de Refeições para não dar conflito com o Caixinha
         if (localStorage.getItem('wm_refeicoes_sessao_ativa') === 'true') {
             document.getElementById('tela-login').style.display = 'none';
             if (document.getElementById('tela-planilha').style.display !== 'block') {
@@ -385,7 +385,7 @@
 
     document.addEventListener('DOMContentLoaded', inicializarAppOffline);
     window.addEventListener('pageshow', function(event) { inicializarAppOffline(); });
-    window.addEventListener('popstate', function(event) { inicializarAppOffline(); }); // Vigia o botão de voltar
+    window.addEventListener('popstate', function(event) { inicializarAppOffline(); }); 
 
     function getDeviceID() {
         let id = localStorage.getItem('wm_device_id');
@@ -513,7 +513,8 @@
         document.getElementById('modal-acao').style.display = 'flex';
 
         if(acao === 'encerrar') {
-            document.getElementById('texto-acao-modal').innerText = "Senha necessária para ENCERRAR O CAIXINHA";
+            // CORREÇÃO DO TEXTO DO MODAL
+            document.getElementById('texto-acao-modal').innerText = "Senha necessária para ENCERRAR A REFEIÇÃO";
         }
     }
 
@@ -764,24 +765,18 @@
     function excluir(index) { if(confirm("Excluir definitivamente?")) { banco.splice(index,1); localStorage.setItem('wm_registros_refeicao', JSON.stringify(banco)); abrirPlanilha(); calcularTotal(); } }
     function gerarPDF() { abrirPlanilha(); setTimeout(() => { window.print(); }, 1500); }
 
-    // ==========================================
-    // ENCERRAMENTO 100% OFFLINE E SEGURO
-    // ==========================================
     function encerrarRelatorio() { 
         if(confirm("Apagar toda a ficha do aparelho? Faça isso apenas DEPOIS de gerar e enviar o PDF!")) { 
             
-            // 1. Apaga APENAS os dados de Refeições da memória (Protege o Caixinha!)
             localStorage.removeItem('wm_registros_refeicao');
             localStorage.removeItem('wm_campos_salvos'); 
             localStorage.removeItem('wm_refeicoes_sessao_ativa'); 
             
-            // 2. Limpa variáveis e tabelas visualmente
             banco = [];
             indiceEdicao = -1;
             calcularTotal();
             document.getElementById('corpo-tabela').innerHTML = "";
 
-            // 3. Zera os campos da tela
             document.getElementById('nome-completo').value = '';
             document.getElementById('cpf').value = '';
             document.getElementById('empresa').value = '';
@@ -808,17 +803,36 @@
             document.getElementById('preco-jantar').value = '';
             verificarCondicionais();
             
-            // 4. Esconde as telas e volta pro login na mesma hora
             document.getElementById('tela-principal').style.display = 'none';
             document.getElementById('tela-planilha').style.display = 'none';
             document.getElementById('tela-login').style.display = 'flex';
             
-            // 5. Zera a senha
             document.getElementById('senha-input').value = '';
             document.getElementById('erro-login').style.display = 'none';
             
             alert("✅ Relatório encerrado, dados e sessão apagados com sucesso!");
         } 
+    }
+
+    // ==========================================
+    // 🔄 FUNÇÃO DE ATUALIZAÇÃO SEGURA DO APLICATIVO
+    // ==========================================
+    async function atualizarAppSeguro() {
+        if(confirm("Deseja buscar a versão mais recente do aplicativo? (Seus dados salvos NÃO serão perdidos)")) {
+            if ('caches' in window) {
+                try {
+                    const nomesCaches = await caches.keys();
+                    await Promise.all(nomesCaches.map(nome => {
+                        // Apaga SOMENTE o cache das refeições para forçar o download novo
+                        if (nome.startsWith('refeicoes-wm-')) return caches.delete(nome);
+                    }));
+                } catch (e) {
+                    console.error("Erro ao limpar o cache isolado:", e);
+                }
+            }
+            // Recarrega a página forçando ignorar o cache antigo no navegador
+            window.location.href = window.location.pathname + '?atualizar=' + new Date().getTime();
+        }
     }
 
     if ('serviceWorker' in navigator) {
@@ -829,7 +843,6 @@
                 novoWorker.onstatechange = () => {
                     if (novoWorker.state === 'installed' && navigator.serviceWorker.controller) {
                         console.log("Nova versão detectada! Atualizando app silenciosamente...");
-                        // Substituído o trator de apagar caches por apenas um reload seguro
                         window.location.reload(true);
                     }
                 };
@@ -840,7 +853,7 @@
         
         document.addEventListener("visibilitychange", () => {
             if (document.visibilityState === "visible") {
-                document.body.offsetHeight; // Força redesenho
+                document.body.offsetHeight; 
                 if (navigator.serviceWorker) {
                     navigator.serviceWorker.ready.then(reg => reg.update());
                 }
