@@ -29,7 +29,7 @@
             --verde-pos: #28a745;
             --vermelho-neg: #dc3545;
             --fundo: #050e20; 
-            --preto-borda: #000000; /* Nova variável para a borda preta */
+            --preto-borda: #000000;
         }
 
         /* Classe para bloquear a rolagem do corpo */
@@ -76,8 +76,13 @@
             -webkit-user-select: auto; -moz-user-select: auto; -ms-user-select: auto; user-select: auto;
         }
 
-        /* ⚠️ AQUI ESTÁ A MUDANÇA NA BORDA DO APP: Preto de um lado, Laranja do outro */
-        .app-container { width: 100%; max-width: 700px; background-color: #f4f7f6; min-height: 95vh; border: 8px solid; border-image: linear-gradient(to right, var(--preto-borda) 50%, var(--laranja-wm) 50%) 1; box-shadow: 0 5px 25px rgba(0,0,0,0.6); box-sizing: border-box; position: relative; border-radius: 4px; }
+        /* ⚠️ CONTORNO BRANCO ADICIONADO NO BOX-SHADOW PARA DELIMITAR O PRETO */
+        .app-container { 
+            width: 100%; max-width: 700px; background-color: #f4f7f6; min-height: 95vh; 
+            border: 8px solid; border-image: linear-gradient(to right, var(--preto-borda) 50%, var(--laranja-wm) 50%) 1; 
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8), 0 5px 25px rgba(0,0,0,0.8); 
+            box-sizing: border-box; position: relative; border-radius: 4px; 
+        }
 
         header { background-color: white; color: var(--azul-wm); padding: 15px 10px; text-align: center; font-weight: bold; display: flex; flex-direction: column; align-items: center; gap: 10px; border-bottom: 2px solid #ddd; }
 
@@ -148,11 +153,11 @@
         /* ========================================== */
         #tela-login, #modal-acao {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000000; /* Fundo alterado para preto */
+            background: #000000;
             z-index: 9999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
-        #modal-acao { background: #000000; display: none; } /* Modal também com fundo preto */
+        #modal-acao { background: #000000; display: none; }
 
         .login-box { background: white; padding: 25px; border-radius: 10px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         .login-box img { max-height: 60px; margin-bottom: 10px; object-fit: contain; pointer-events: none; }
@@ -189,7 +194,7 @@
 
         <div style="display: flex; gap: 10px; width: 100%;">
             <button class="btn-salvar" style="flex: 1; font-size: 14px; padding: 12px; margin-top: 5px;" onclick="validarSenhaAcao()">CONFIRMAR</button>
-            <button class="btn-encerrar" style="flex: 1; font-size: 14px; padding: 12px; background-color: #777; margin-top: 5px;" onclick="fecharModalAcao()">CANCELAR</button>
+            <button class="btn-salvar" style="flex: 1; font-size: 14px; padding: 12px; margin-top: 5px;" onclick="fecharModalAcao()">CANCELAR</button>
         </div>
         <p id="erro-senha-acao" style="color: red; font-size: 13px; font-weight: bold; display: none; margin-top: 15px;">❌ Senha incorreta!</p>
     </div>
@@ -240,33 +245,68 @@
             </div>
 
             <div class="label-linha">
-                <label>Função (Digite para buscar): <span style="color:red">*</span></label>
+                <label>Função (Digite ou Selecione): <span style="color:red">*</span></label>
                 <label class="chk-pequeno"><input type="checkbox" id="chk-funcao"> ✅ Salvar</label>
             </div>
-            <input list="lista-funcoes" id="funcao" placeholder="--- Digite ou selecione na lista ---">
+            <input list="lista-funcoes" id="funcao" placeholder="--- Digite para buscar na lista ---">
             <datalist id="lista-funcoes">
                 <option value="Ajudante Geral">
                 <option value="Almoxarife">
+                <option value="Analista Ambiental">
+                <option value="Analista de Qualidade">
+                <option value="Analista de RH">
                 <option value="Armador">
+                <option value="Assistente Administrativo">
+                <option value="Assistente de RH">
+                <option value="Auxiliar Administrativo">
+                <option value="Auxiliar de Topografia">
                 <option value="Carpinteiro">
+                <option value="Comprador">
+                <option value="Diretor">
                 <option value="Eletricista de Manutenção">
                 <option value="Eletricista Montador">
-                <option value="Encarregado de Obras">
+                <option value="Encarregado Civil">
                 <option value="Encarregado de Montagem">
+                <option value="Encarregado de Obras">
+                <option value="Encarregado Elétrico">
                 <option value="Engenheiro Civil">
                 <option value="Engenheiro Eletricista">
+                <option value="Engenheiro Mecânico">
+                <option value="Engenheiro de Segurança do Trabalho">
+                <option value="Ferreiro">
+                <option value="Gerente Administrativo">
+                <option value="Gestor de Obras">
                 <option value="Guindasteiro">
+                <option value="Inspetor de Qualidade">
+                <option value="Laboratorista de Solos e Concreto">
                 <option value="Marteleteiro">
                 <option value="Mecânico de Manutenção">
+                <option value="Mestre de Obras">
                 <option value="Montador de Estruturas">
+                <option value="Montador Eólico">
+                <option value="Motorista de Caminhão Basculante">
+                <option value="Motorista de Caminhão Betoneira">
                 <option value="Motorista de Munck">
+                <option value="Motorista de Ônibus/Vans">
+                <option value="Operador de Betoneira">
+                <option value="Operador de Compactador">
                 <option value="Operador de Escavadeira">
+                <option value="Operador de Guindaste">
+                <option value="Operador de Motoniveladora">
+                <option value="Operador de Pá Carregadeira">
+                <option value="Operador de Retroescavadeira">
+                <option value="Operador de Rolo Compactador">
+                <option value="Operador de Trator de Esteira">
                 <option value="Pedreiro">
                 <option value="Pintor">
+                <option value="Rigger (Sinaleiro)">
                 <option value="Servente">
                 <option value="Soldador">
+                <option value="Técnico de Planejamento">
+                <option value="Técnico de Qualidade">
                 <option value="Técnico de Segurança do Trabalho">
                 <option value="Topógrafo">
+                <option value="Vigia / Porteiro">
             </datalist>
 
             <div class="label-linha">
