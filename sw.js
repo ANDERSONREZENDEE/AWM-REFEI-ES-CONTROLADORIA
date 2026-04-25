@@ -1,5 +1,5 @@
 const PREFIXO_CACHE = 'refeicoes-wm-';
-const CACHE_NAME = PREFIXO_CACHE + 'v5'; // Atualizado para v5 para forçar a mudança
+const CACHE_NAME = PREFIXO_CACHE + 'v6'; // Atualizado para v6 para forçar a mudança no celular
 
 // Arquivos principais para guardar offline imediatamente
 const arquivosParaGuardar = [
@@ -11,8 +11,7 @@ const arquivosParaGuardar = [
   './Captura de tela 2026-02-13 132630.jpg',
   './icone_v3.png',
   './OLHOABERTO.png',
-  './OLHOFECHADO_V2.png',
-  './atalho.png'
+  './OLHOFECHADO_V2.png'
 ];
 
 self.addEventListener('install', evento => {
