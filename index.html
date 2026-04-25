@@ -76,11 +76,11 @@
             -webkit-user-select: auto; -moz-user-select: auto; -ms-user-select: auto; user-select: auto;
         }
 
-        /* ⚠️ CONTORNO BRANCO ADICIONADO NO BOX-SHADOW PARA DELIMITAR O PRETO */
+        /* ⚠️ CONTORNO BRANCO MAIS GROSSO (5px) PARA DESTACAR BEM DO FUNDO */
         .app-container { 
             width: 100%; max-width: 700px; background-color: #f4f7f6; min-height: 95vh; 
             border: 8px solid; border-image: linear-gradient(to right, var(--preto-borda) 50%, var(--laranja-wm) 50%) 1; 
-            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8), 0 5px 25px rgba(0,0,0,0.8); 
+            box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.95), 0 5px 25px rgba(0,0,0,0.8); 
             box-sizing: border-box; position: relative; border-radius: 4px; 
         }
 
@@ -98,8 +98,6 @@
         
         .label-linha { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 8px; }
         label { font-size: 12px; font-weight: bold; color: #555; }
-        .chk-pequeno { font-size: 10px; color: #333; display: flex; align-items: center; gap: 4px; font-weight: normal; cursor: pointer; background: #e2e8f0; padding: 3px 6px; border-radius: 4px; border: 1px solid #cbd5e1; }
-        .chk-pequeno input { width: 14px; height: 14px; margin: 0; cursor: pointer; padding: 0; }
 
         .btn-salvar { background-color: var(--azul-wm); color: white; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 15px; }
         .btn-ver-planilha { background-color: var(--laranja-wm); color: white; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 5px;}
@@ -219,99 +217,101 @@
             
             <div class="label-linha">
                 <label>Nome completo: <span style="color:red">*</span></label>
-                <label class="chk-pequeno" title="Deixar gravado para o próximo registro"><input type="checkbox" id="chk-nome"> ✅ Salvar</label>
             </div>
-            <input type="text" id="nome-completo" placeholder="Digite o nome completo">
+            <input type="text" id="nome-completo" placeholder="Digite o nome completo" onchange="gravarConfiguracoesSalvas()">
 
             <div class="label-linha">
                 <label>CPF: <span style="color:red">*</span></label>
-                <label class="chk-pequeno"><input type="checkbox" id="chk-cpf"> ✅ Salvar</label>
             </div>
-            <input type="text" id="cpf" placeholder="000.000.000-00" oninput="mascaraCPF(this)" onkeyup="verificarErroCPF()">
+            <input type="text" id="cpf" placeholder="000.000.000-00" oninput="mascaraCPF(this)" onkeyup="verificarErroCPF()" onchange="gravarConfiguracoesSalvas()">
             <div id="erro-cpf" class="erro-msg">CPF INVÁLIDO!!!</div>
 
             <div class="label-linha">
                 <label>Empresa: <span style="color:red">*</span></label>
-                <label class="chk-pequeno"><input type="checkbox" id="chk-empresa"> ✅ Salvar</label>
             </div>
             <select id="empresa" onchange="verificarCondicionais()">
                 <option value="" disabled selected>--- Selecione na lista suspensa ---</option>
                 <option value="WM Construções e Montagens">WM Construções e Montagens</option>
-                <option value="Outra Empresa">Outra Empresa</option>
+                <option value="Outra Empresa">Outra Empresa (Adicionar)</option>
             </select>
             <div id="div-qual-empresa" class="campo-condicional">
                 <label>Qual empresa? <span style="color:red">*</span></label>
-                <input type="text" id="qual-empresa" placeholder="Digite o nome da empresa">
+                <input type="text" id="qual-empresa" placeholder="Digite o nome da empresa" onchange="gravarConfiguracoesSalvas()">
             </div>
 
             <div class="label-linha">
-                <label>Função (Digite ou Selecione): <span style="color:red">*</span></label>
-                <label class="chk-pequeno"><input type="checkbox" id="chk-funcao"> ✅ Salvar</label>
+                <label>Função: <span style="color:red">*</span></label>
             </div>
-            <input list="lista-funcoes" id="funcao" placeholder="--- Digite para buscar na lista ---">
-            <datalist id="lista-funcoes">
-                <option value="Ajudante Geral">
-                <option value="Almoxarife">
-                <option value="Analista Ambiental">
-                <option value="Analista de Qualidade">
-                <option value="Analista de RH">
-                <option value="Armador">
-                <option value="Assistente Administrativo">
-                <option value="Assistente de RH">
-                <option value="Auxiliar Administrativo">
-                <option value="Auxiliar de Topografia">
-                <option value="Carpinteiro">
-                <option value="Comprador">
-                <option value="Diretor">
-                <option value="Eletricista de Manutenção">
-                <option value="Eletricista Montador">
-                <option value="Encarregado Civil">
-                <option value="Encarregado de Montagem">
-                <option value="Encarregado de Obras">
-                <option value="Encarregado Elétrico">
-                <option value="Engenheiro Civil">
-                <option value="Engenheiro Eletricista">
-                <option value="Engenheiro Mecânico">
-                <option value="Engenheiro de Segurança do Trabalho">
-                <option value="Ferreiro">
-                <option value="Gerente Administrativo">
-                <option value="Gestor de Obras">
-                <option value="Guindasteiro">
-                <option value="Inspetor de Qualidade">
-                <option value="Laboratorista de Solos e Concreto">
-                <option value="Marteleteiro">
-                <option value="Mecânico de Manutenção">
-                <option value="Mestre de Obras">
-                <option value="Montador de Estruturas">
-                <option value="Montador Eólico">
-                <option value="Motorista de Caminhão Basculante">
-                <option value="Motorista de Caminhão Betoneira">
-                <option value="Motorista de Munck">
-                <option value="Motorista de Ônibus/Vans">
-                <option value="Operador de Betoneira">
-                <option value="Operador de Compactador">
-                <option value="Operador de Escavadeira">
-                <option value="Operador de Guindaste">
-                <option value="Operador de Motoniveladora">
-                <option value="Operador de Pá Carregadeira">
-                <option value="Operador de Retroescavadeira">
-                <option value="Operador de Rolo Compactador">
-                <option value="Operador de Trator de Esteira">
-                <option value="Pedreiro">
-                <option value="Pintor">
-                <option value="Rigger (Sinaleiro)">
-                <option value="Servente">
-                <option value="Soldador">
-                <option value="Técnico de Planejamento">
-                <option value="Técnico de Qualidade">
-                <option value="Técnico de Segurança do Trabalho">
-                <option value="Topógrafo">
-                <option value="Vigia / Porteiro">
-            </datalist>
+            <select id="funcao" onchange="verificarCondicionais()">
+                <option value="" disabled selected>--- Selecione na lista suspensa ---</option>
+                <option value="Ajudante Geral">Ajudante Geral</option>
+                <option value="Almoxarife">Almoxarife</option>
+                <option value="Analista Ambiental">Analista Ambiental</option>
+                <option value="Analista de Qualidade">Analista de Qualidade</option>
+                <option value="Analista de RH">Analista de RH</option>
+                <option value="Armador">Armador</option>
+                <option value="Assistente Administrativo">Assistente Administrativo</option>
+                <option value="Assistente de RH">Assistente de RH</option>
+                <option value="Assistente Financeiro">Assistente Financeiro</option>
+                <option value="Auxiliar Administrativo">Auxiliar Administrativo</option>
+                <option value="Auxiliar de Topografia">Auxiliar de Topografia</option>
+                <option value="Carpinteiro">Carpinteiro</option>
+                <option value="Comprador">Comprador</option>
+                <option value="Diretor">Diretor</option>
+                <option value="Eletricista de Manutenção">Eletricista de Manutenção</option>
+                <option value="Eletricista Montador">Eletricista Montador</option>
+                <option value="Encarregado Civil">Encarregado Civil</option>
+                <option value="Encarregado de Montagem">Encarregado de Montagem</option>
+                <option value="Encarregado de Obras">Encarregado de Obras</option>
+                <option value="Encarregado Elétrico">Encarregado Elétrico</option>
+                <option value="Engenheiro Civil">Engenheiro Civil</option>
+                <option value="Engenheiro de Segurança do Trabalho">Engenheiro de Segurança do Trabalho</option>
+                <option value="Engenheiro Eletricista">Engenheiro Eletricista</option>
+                <option value="Engenheiro Mecânico">Engenheiro Mecânico</option>
+                <option value="Ferreiro">Ferreiro</option>
+                <option value="Gerente Administrativo">Gerente Administrativo</option>
+                <option value="Gerente Administrativo e Financeiro">Gerente Administrativo e Financeiro</option>
+                <option value="Gestor de Obras">Gestor de Obras</option>
+                <option value="Guindasteiro">Guindasteiro</option>
+                <option value="Inspetor de Qualidade">Inspetor de Qualidade</option>
+                <option value="Laboratorista de Solos e Concreto">Laboratorista de Solos e Concreto</option>
+                <option value="Marteleteiro">Marteleteiro</option>
+                <option value="Mecânico de Manutenção">Mecânico de Manutenção</option>
+                <option value="Mestre de Obras">Mestre de Obras</option>
+                <option value="Montador de Estruturas">Montador de Estruturas</option>
+                <option value="Montador Eólico">Montador Eólico</option>
+                <option value="Motorista de Caminhão Basculante">Motorista de Caminhão Basculante</option>
+                <option value="Motorista de Caminhão Betoneira">Motorista de Caminhão Betoneira</option>
+                <option value="Motorista de Munck">Motorista de Munck</option>
+                <option value="Motorista de Ônibus/Vans">Motorista de Ônibus/Vans</option>
+                <option value="Operador de Betoneira">Operador de Betoneira</option>
+                <option value="Operador de Compactador">Operador de Compactador</option>
+                <option value="Operador de Escavadeira">Operador de Escavadeira</option>
+                <option value="Operador de Guindaste">Operador de Guindaste</option>
+                <option value="Operador de Motoniveladora">Operador de Motoniveladora</option>
+                <option value="Operador de Pá Carregadeira">Operador de Pá Carregadeira</option>
+                <option value="Operador de Retroescavadeira">Operador de Retroescavadeira</option>
+                <option value="Operador de Rolo Compactador">Operador de Rolo Compactador</option>
+                <option value="Operador de Trator de Esteira">Operador de Trator de Esteira</option>
+                <option value="Pedreiro">Pedreiro</option>
+                <option value="Pintor">Pintor</option>
+                <option value="Rigger (Sinaleiro)">Rigger (Sinaleiro)</option>
+                <option value="Servente">Servente</option>
+                <option value="Soldador">Soldador</option>
+                <option value="Técnico de Planejamento">Técnico de Planejamento</option>
+                <option value="Técnico de Qualidade">Técnico de Qualidade</option>
+                <option value="Técnico de Segurança do Trabalho">Técnico de Segurança do Trabalho</option>
+                <option value="Topógrafo">Topógrafo</option>
+                <option value="Vigia / Porteiro">Vigia / Porteiro</option>
+                <option value="Outra Função">Outra Função (Adicionar)</option>
+            </select>
+            <div id="div-qual-funcao" class="campo-condicional">
+                <label>Qual Função? <span style="color:red">*</span></label>
+                <input type="text" id="qual-funcao" placeholder="Digite o nome da função" onchange="gravarConfiguracoesSalvas()">
+            </div>
 
             <div class="label-linha">
                 <label>Obra: <span style="color:red">*</span></label>
-                <label class="chk-pequeno"><input type="checkbox" id="chk-obra"> ✅ Salvar</label>
             </div>
             <select id="obra" onchange="verificarCondicionais()">
                 <option value="" disabled selected>--- Selecione na lista suspensa ---</option>
@@ -328,12 +328,11 @@
             </select>
             <div id="div-qual-obra" class="campo-condicional">
                 <label>Qual Obra? <span style="color:red">*</span></label>
-                <input type="text" id="qual-obra" placeholder="Digite o nome da obra">
+                <input type="text" id="qual-obra" placeholder="Digite o nome da obra" onchange="gravarConfiguracoesSalvas()">
             </div>
 
             <div class="label-linha">
                 <label>Restaurante: <span style="color:red">*</span></label>
-                <label class="chk-pequeno"><input type="checkbox" id="chk-restaurante"> ✅ Salvar</label>
             </div>
             <select id="restaurante" onchange="verificarCondicionais()">
                 <option value="" disabled selected>--- Selecione na lista suspensa ---</option>
@@ -343,26 +342,25 @@
             </select>
             <div id="div-qual-restaurante" class="campo-condicional">
                 <label>Qual Restaurante? <span style="color:red">*</span></label>
-                <input type="text" id="qual-restaurante" placeholder="Digite o nome do restaurante">
+                <input type="text" id="qual-restaurante" placeholder="Digite o nome do restaurante" onchange="gravarConfiguracoesSalvas()">
             </div>
 
             <div style="background: #e2e8f0; padding: 10px; border-radius: 5px; border: 1px solid #cbd5e1; margin-top: 5px;">
                 <div class="label-linha" style="margin-top: 0;">
                     <label>Tabela de Preços (R$):</label>
-                    <label class="chk-pequeno"><input type="checkbox" id="chk-precos"> ✅ Salvar Preços</label>
                 </div>
                 <div style="display: flex; gap: 8px; margin-top: 5px;">
                     <div style="flex: 1;">
                         <label style="font-size: 10px; color: #555;">Café</label>
-                        <input type="text" id="preco-cafe" placeholder="0,00" oninput="mascaraMoeda(this)" style="padding: 8px; font-size: 12px;">
+                        <input type="text" id="preco-cafe" placeholder="0,00" oninput="mascaraMoeda(this)" onchange="gravarConfiguracoesSalvas()" style="padding: 8px; font-size: 12px;">
                     </div>
                     <div style="flex: 1;">
                         <label style="font-size: 10px; color: #555;">Almoço</label>
-                        <input type="text" id="preco-almoco" placeholder="0,00" oninput="mascaraMoeda(this)" style="padding: 8px; font-size: 12px;">
+                        <input type="text" id="preco-almoco" placeholder="0,00" oninput="mascaraMoeda(this)" onchange="gravarConfiguracoesSalvas()" style="padding: 8px; font-size: 12px;">
                     </div>
                     <div style="flex: 1;">
                         <label style="font-size: 10px; color: #555;">Jantar</label>
-                        <input type="text" id="preco-jantar" placeholder="0,00" oninput="mascaraMoeda(this)" style="padding: 8px; font-size: 12px;">
+                        <input type="text" id="preco-jantar" placeholder="0,00" oninput="mascaraMoeda(this)" onchange="gravarConfiguracoesSalvas()" style="padding: 8px; font-size: 12px;">
                     </div>
                 </div>
             </div>
@@ -466,7 +464,7 @@
     function inicializarAppOffline() {
         if (localStorage.getItem('wm_refeicoes_sessao_ativa') === 'true') {
             document.getElementById('tela-login').style.display = 'none';
-            toggleBodyScroll(false); // Garante scroll destravado na entrada
+            toggleBodyScroll(false); 
             if (document.getElementById('tela-planilha').style.display !== 'block') {
                 document.getElementById('tela-principal').style.display = 'block';
             }
@@ -474,7 +472,7 @@
             document.getElementById('tela-principal').style.display = 'none';
             document.getElementById('tela-planilha').style.display = 'none';
             document.getElementById('tela-login').style.display = 'flex';
-            toggleBodyScroll(true); // Trava scroll na tela de login
+            toggleBodyScroll(true); 
         }
         
         calcularTotal();
@@ -518,27 +516,30 @@
     function carregarConfiguracoesSalvas() {
         let configs = JSON.parse(localStorage.getItem('wm_campos_salvos')) || {};
         
-        ['nome', 'cpf', 'empresa', 'funcao', 'obra', 'restaurante'].forEach(campo => {
-            if (configs[campo] && configs[campo].salvar) {
-                document.getElementById('chk-' + campo).checked = true;
-                
-                if(campo === 'empresa' && configs.empresa.txt) {
-                    document.getElementById('empresa').value = 'Outra Empresa';
-                    document.getElementById('qual-empresa').value = configs.empresa.txt;
-                } else if(campo === 'obra' && configs.obra.txt) {
-                    document.getElementById('obra').value = 'Outra Obra';
-                    document.getElementById('qual-obra').value = configs.obra.txt;
-                } else if(campo === 'restaurante' && configs.restaurante.txt) {
-                    document.getElementById('restaurante').value = 'Outro Restaurante';
-                    document.getElementById('qual-restaurante').value = configs.restaurante.txt;
-                } else {
-                    document.getElementById(campo === 'nome' ? 'nome-completo' : campo).value = configs[campo].valor;
-                }
-            }
-        });
+        if (configs.nome) document.getElementById('nome-completo').value = configs.nome;
+        if (configs.cpf) document.getElementById('cpf').value = configs.cpf;
+        
+        if (configs.empresa) {
+            document.getElementById('empresa').value = configs.empresa.valor || '';
+            if(configs.empresa.valor === 'Outra Empresa') document.getElementById('qual-empresa').value = configs.empresa.txt || '';
+        }
+        
+        if (configs.funcao) {
+            document.getElementById('funcao').value = configs.funcao.valor || '';
+            if(configs.funcao.valor === 'Outra Função') document.getElementById('qual-funcao').value = configs.funcao.txt || '';
+        }
 
-        if (configs.precos && configs.precos.salvar) {
-            document.getElementById('chk-precos').checked = true;
+        if (configs.obra) {
+            document.getElementById('obra').value = configs.obra.valor || '';
+            if(configs.obra.valor === 'Outra Obra') document.getElementById('qual-obra').value = configs.obra.txt || '';
+        }
+
+        if (configs.restaurante) {
+            document.getElementById('restaurante').value = configs.restaurante.valor || '';
+            if(configs.restaurante.valor === 'Outro Restaurante') document.getElementById('qual-restaurante').value = configs.restaurante.txt || '';
+        }
+
+        if (configs.precos) {
             document.getElementById('preco-cafe').value = configs.precos.cafe || '';
             document.getElementById('preco-almoco').value = configs.precos.almoco || '';
             document.getElementById('preco-jantar').value = configs.precos.jantar || '';
@@ -550,24 +551,34 @@
     function gravarConfiguracoesSalvas() {
         let configs = {};
         let selEmpresa = document.getElementById('empresa').value;
+        let selFuncao = document.getElementById('funcao').value;
         let selObra = document.getElementById('obra').value;
         let selRestaurante = document.getElementById('restaurante').value;
 
-        configs.nome = { salvar: document.getElementById('chk-nome').checked, valor: document.getElementById('nome-completo').value };
-        configs.cpf = { salvar: document.getElementById('chk-cpf').checked, valor: document.getElementById('cpf').value };
-        configs.empresa = { salvar: document.getElementById('chk-empresa').checked, valor: selEmpresa, txt: (selEmpresa === 'Outra Empresa' ? document.getElementById('qual-empresa').value : '') };
-        configs.funcao = { salvar: document.getElementById('chk-funcao').checked, valor: document.getElementById('funcao').value };
-        configs.obra = { salvar: document.getElementById('chk-obra').checked, valor: selObra, txt: (selObra === 'Outra Obra' ? document.getElementById('qual-obra').value : '') };
-        configs.restaurante = { salvar: document.getElementById('chk-restaurante').checked, valor: selRestaurante, txt: (selRestaurante === 'Outro Restaurante' ? document.getElementById('qual-restaurante').value : '') };
+        configs.nome = document.getElementById('nome-completo').value;
+        configs.cpf = document.getElementById('cpf').value;
+        configs.empresa = { valor: selEmpresa, txt: (selEmpresa === 'Outra Empresa' ? document.getElementById('qual-empresa').value : '') };
+        configs.funcao = { valor: selFuncao, txt: (selFuncao === 'Outra Função' ? document.getElementById('qual-funcao').value : '') };
+        configs.obra = { valor: selObra, txt: (selObra === 'Outra Obra' ? document.getElementById('qual-obra').value : '') };
+        configs.restaurante = { valor: selRestaurante, txt: (selRestaurante === 'Outro Restaurante' ? document.getElementById('qual-restaurante').value : '') };
         
         configs.precos = { 
-            salvar: document.getElementById('chk-precos').checked, 
             cafe: document.getElementById('preco-cafe').value,
             almoco: document.getElementById('preco-almoco').value,
             jantar: document.getElementById('preco-jantar').value
         };
 
         localStorage.setItem('wm_campos_salvos', JSON.stringify(configs));
+    }
+
+    function verificarCondicionais() {
+        document.getElementById('div-qual-empresa').style.display = document.getElementById('empresa').value === 'Outra Empresa' ? 'block' : 'none';
+        document.getElementById('div-qual-funcao').style.display = document.getElementById('funcao').value === 'Outra Função' ? 'block' : 'none';
+        document.getElementById('div-qual-obra').style.display = document.getElementById('obra').value === 'Outra Obra' ? 'block' : 'none';
+        document.getElementById('div-qual-restaurante').style.display = document.getElementById('restaurante').value === 'Outro Restaurante' ? 'block' : 'none';
+        
+        // Garante que a escolha principal seja salva se for mudada sem digitar no campo de texto
+        gravarConfiguracoesSalvas();
     }
 
     async function gerarHash(texto) {
@@ -588,7 +599,7 @@
             document.getElementById('tela-principal').style.display = 'block'; 
             document.getElementById('senha-input').value = '';
             document.getElementById('erro-login').style.display = 'none';
-            toggleBodyScroll(false); // Destrava o scroll ao logar
+            toggleBodyScroll(false); 
         } else {
             document.getElementById('erro-login').style.display = 'block';
         }
@@ -602,15 +613,12 @@
     }
 
     function sairDoApp() {
-        // Antes de sair, garante que o rascunho atual foi salvo
         gravarConfiguracoesSalvas();
         localStorage.removeItem('wm_refeicoes_sessao_ativa');
         
-        // Esconde as telas principais
         document.getElementById('tela-principal').style.display = 'none';
         document.getElementById('tela-planilha').style.display = 'none';
         
-        // Mostra o login e trava o scroll
         document.getElementById('tela-login').style.display = 'flex';
         document.getElementById('senha-input').value = '';
         toggleBodyScroll(true);
@@ -623,7 +631,7 @@
         document.getElementById('senha-acao-input').value = '';
         document.getElementById('erro-senha-acao').style.display = 'none';
         document.getElementById('modal-acao').style.display = 'flex';
-        toggleBodyScroll(true); // Trava o scroll ao abrir o modal
+        toggleBodyScroll(true); 
 
         if(acao === 'encerrar') {
             document.getElementById('texto-acao-modal').innerText = "Senha necessária para APAGAR TUDO E SAIR";
@@ -633,7 +641,7 @@
     function fecharModalAcao() {
         document.getElementById('modal-acao').style.display = 'none';
         acaoPendente = '';
-        toggleBodyScroll(false); // Destrava o scroll ao fechar o modal
+        toggleBodyScroll(false); 
     }
 
     function mostrarSenhaAcao() {
@@ -653,7 +661,6 @@
                 encerrarRelatorio();
             }
             acaoPendente = '';
-            // Nota: toggleBodyScroll(false) será chamado dentro de encerrarRelatorio() ao voltar pro login.
         } else {
             document.getElementById('erro-senha-acao').style.display = 'block';
         }
@@ -691,12 +698,6 @@
         } else { document.getElementById('erro-cpf').style.display = 'none'; }
     }
 
-    function verificarCondicionais() {
-        document.getElementById('div-qual-empresa').style.display = document.getElementById('empresa').value === 'Outra Empresa' ? 'block' : 'none';
-        document.getElementById('div-qual-obra').style.display = document.getElementById('obra').value === 'Outra Obra' ? 'block' : 'none';
-        document.getElementById('div-qual-restaurante').style.display = document.getElementById('restaurante').value === 'Outro Restaurante' ? 'block' : 'none';
-    }
-
     function comprimirImagem(file) {
         return new Promise((resolve) => {
             if (!file) { resolve(null); return; }
@@ -723,13 +724,19 @@
     async function salvarRefeicao() {
         let nome = document.getElementById('nome-completo').value;
         let cpf = document.getElementById('cpf').value;
+        
         let selEmpresa = document.getElementById('empresa').value;
         let txtEmpresa = document.getElementById('qual-empresa').value;
-        let txtFuncao = document.getElementById('funcao').value; 
+        
+        let selFuncao = document.getElementById('funcao').value; 
+        let txtFuncao = document.getElementById('qual-funcao').value;
+        
         let selObra = document.getElementById('obra').value;
         let txtObra = document.getElementById('qual-obra').value;
+        
         let selRestaurante = document.getElementById('restaurante').value;
         let txtRestaurante = document.getElementById('qual-restaurante').value;
+        
         let selRefeicao = document.getElementById('refeicao').value;
 
         let valPreco = "R$ 0,00";
@@ -743,7 +750,7 @@
         if(!nome || !cpf) return alert("⚠️ Atenção: Preencha Nome Completo e CPF!");
         if(!validarCPF(cpf)) { document.getElementById('erro-cpf').style.display = 'block'; return alert("❌ CPF INVÁLIDO!!! Verifique o número digitado."); }
         if (!selEmpresa || (selEmpresa === 'Outra Empresa' && !txtEmpresa)) return alert("⚠️ Informe a Empresa!");
-        if (!txtFuncao) return alert("⚠️ Informe a Função!");
+        if (!selFuncao || (selFuncao === 'Outra Função' && !txtFuncao)) return alert("⚠️ Informe a Função!");
         if (!selObra || (selObra === 'Outra Obra' && !txtObra)) return alert("⚠️ Informe a Obra!");
         if (!selRestaurante || (selRestaurante === 'Outro Restaurante' && !txtRestaurante)) return alert("⚠️ Informe o Restaurante!");
         if (!selRefeicao) return alert("⚠️ Selecione a Refeição Atendida!");
@@ -779,7 +786,7 @@
         let item = {
             nome: nome, cpf: cpf,
             empresa_sel: selEmpresa, empresa_txt: txtEmpresa,
-            funcao_txt: txtFuncao,
+            funcao_sel: selFuncao, funcao_txt: txtFuncao, // Salva o novo padrão de função
             obra_sel: selObra, obra_txt: txtObra,
             restaurante_sel: selRestaurante, restaurante_txt: txtRestaurante,
             refeicao: selRefeicao,
@@ -801,15 +808,11 @@
 
         try {
             localStorage.setItem('wm_registros_refeicao', JSON.stringify(banco));
+            
+            // Grava os dados para manter no formulário automático
             gravarConfiguracoesSalvas(); 
 
-            if(!document.getElementById('chk-nome').checked) document.getElementById('nome-completo').value = '';
-            if(!document.getElementById('chk-cpf').checked) document.getElementById('cpf').value = '';
-            if(!document.getElementById('chk-empresa').checked) { document.getElementById('empresa').value = ''; document.getElementById('qual-empresa').value = ''; }
-            if(!document.getElementById('chk-funcao').checked) document.getElementById('funcao').value = '';
-            if(!document.getElementById('chk-obra').checked) { document.getElementById('obra').value = ''; document.getElementById('qual-obra').value = ''; }
-            if(!document.getElementById('chk-restaurante').checked) { document.getElementById('restaurante').value = ''; document.getElementById('qual-restaurante').value = ''; }
-            
+            // ⚠️ Limpa APENAS a refeição e as fotos
             document.getElementById('refeicao').value = '';
             document.getElementById('foto-local').value = ''; 
             document.getElementById('foto-assinatura').value = ''; 
@@ -817,7 +820,6 @@
             document.getElementById('btn-salvar-principal').innerText = "✅ Salvar o lançamento";
             document.getElementById('erro-cpf').style.display = 'none';
             calcularTotal(); 
-            verificarCondicionais();
             alert("✔️ Registro Salvo com Sucesso!");
         } catch (e) {
             alert("❌ Memória do celular cheia! Gere o PDF e limpe a ficha.");
@@ -844,6 +846,7 @@
             fotosHTML += `</div>`;
 
             let displayEmpresa = item.empresa_sel === 'Outra Empresa' ? item.empresa_txt : item.empresa_sel;
+            let displayFuncao = item.funcao_sel === 'Outra Função' ? item.funcao_txt : item.funcao_sel;
             let displayObra = item.obra_sel === 'Outra Obra' ? item.obra_txt : item.obra_sel;
             let displayRestaurante = item.restaurante_sel === 'Outro Restaurante' ? item.restaurante_txt : item.restaurante_sel;
             
@@ -856,7 +859,7 @@
                 <td style="text-align:left;"><b>${item.nome}</b></td>
                 <td>${item.cpf}</td>
                 <td>${displayEmpresa}</td>
-                <td>${item.funcao_txt}</td>
+                <td>${displayFuncao}</td>
                 <td>${displayObra}</td>
                 <td style="color:#f39c12;"><b>${displayRestaurante}</b></td>
                 <td><b>${item.refeicao}</b></td>
@@ -882,14 +885,21 @@
         let it = banco[index];
         document.getElementById('nome-completo').value = it.nome;
         document.getElementById('cpf').value = it.cpf;
-        document.getElementById('empresa').value = it.empresa_sel;
+        
+        document.getElementById('empresa').value = it.empresa_sel || '';
         document.getElementById('qual-empresa').value = it.empresa_txt || '';
-        document.getElementById('funcao').value = it.funcao_txt || '';
-        document.getElementById('obra').value = it.obra_sel;
+        
+        document.getElementById('funcao').value = it.funcao_sel || '';
+        document.getElementById('qual-funcao').value = it.funcao_txt || '';
+        
+        document.getElementById('obra').value = it.obra_sel || '';
         document.getElementById('qual-obra').value = it.obra_txt || '';
+        
         document.getElementById('restaurante').value = it.restaurante_sel || '';
         document.getElementById('qual-restaurante').value = it.restaurante_txt || '';
+        
         document.getElementById('refeicao').value = it.refeicao;
+        
         verificarCondicionais();
         document.getElementById('erro-cpf').style.display = 'none';
         indiceEdicao = index;
@@ -914,12 +924,13 @@
             calcularTotal();
             document.getElementById('corpo-tabela').innerHTML = "";
 
-            // 3. Zera os campos da tela
+            // 3. Zera todos os campos da tela
             document.getElementById('nome-completo').value = '';
             document.getElementById('cpf').value = '';
             document.getElementById('empresa').value = '';
             document.getElementById('qual-empresa').value = '';
             document.getElementById('funcao').value = '';
+            document.getElementById('qual-funcao').value = '';
             document.getElementById('obra').value = '';
             document.getElementById('qual-obra').value = '';
             document.getElementById('restaurante').value = '';
@@ -927,14 +938,6 @@
             document.getElementById('refeicao').value = '';
             document.getElementById('foto-local').value = ''; 
             document.getElementById('foto-assinatura').value = ''; 
-
-            document.getElementById('chk-nome').checked = false;
-            document.getElementById('chk-cpf').checked = false;
-            document.getElementById('chk-empresa').checked = false;
-            document.getElementById('chk-funcao').checked = false;
-            document.getElementById('chk-obra').checked = false;
-            document.getElementById('chk-restaurante').checked = false;
-            document.getElementById('chk-precos').checked = false;
             
             document.getElementById('preco-cafe').value = '';
             document.getElementById('preco-almoco').value = '';
