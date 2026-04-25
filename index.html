@@ -28,12 +28,47 @@
             --laranja-wm: #f39c12; 
             --verde-pos: #28a745;
             --vermelho-neg: #dc3545;
-            --fundo: #f4f7f6;
+            --fundo: #050e20; 
+            --preto-borda: #000000; /* Nova variável para a borda preta */
         }
 
+        /* Classe para bloquear a rolagem do corpo */
+        .no-scroll {
+            overflow: hidden !important;
+            height: 100% !important;
+        }
+
+        /* ========================================== */
+        /* 🛡️ NOVO FUNDO ESPACIAL (SIMULADO VIA CSS) 🛡️ */
+        /* ========================================== */
         body { 
-            font-family: Arial, sans-serif; background-color: #ccc; margin: 0; display: flex; justify-content: center; padding: 10px; 
+            font-family: Arial, sans-serif; margin: 0; display: flex; justify-content: center; padding: 10px; 
             -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; -webkit-touch-callout: none;
+            
+            /* Gradiente de fundo base (roxo profundo para violeta) */
+            background: linear-gradient(135deg, var(--fundo) 0%, #1a0a2e 40%, #050e20 100%);
+            background-attachment: fixed;
+            position: relative;
+        }
+
+        /* Camada para nebulosas e sobreposição de estrelas */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            /* Nebulosas simuladas com radial-gradients transparentes */
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(100, 0, 150, 0.4) 0%, transparent 60%),
+                radial-gradient(circle at 80% 70%, rgba(50, 0, 100, 0.3) 0%, transparent 50%),
+                /* Estrelas simuladas */
+                radial-gradient(1px 1px at 10% 10%, #fff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 30% 50%, #fff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 70% 20%, #fff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 90% 80%, #fff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 50% 90%, #fff, rgba(0,0,0,0));
+            background-attachment: fixed;
+            opacity: 0.8;
         }
 
         input, select, textarea {
@@ -41,7 +76,8 @@
             -webkit-user-select: auto; -moz-user-select: auto; -ms-user-select: auto; user-select: auto;
         }
 
-        .app-container { width: 100%; max-width: 700px; background-color: var(--fundo); min-height: 95vh; border: 8px solid; border-image: linear-gradient(to right, var(--azul-wm) 50%, var(--laranja-wm) 50%) 1; box-shadow: 0 5px 15px rgba(0,0,0,0.3); box-sizing: border-box; position: relative; }
+        /* ⚠️ AQUI ESTÁ A MUDANÇA NA BORDA DO APP: Preto de um lado, Laranja do outro */
+        .app-container { width: 100%; max-width: 700px; background-color: #f4f7f6; min-height: 95vh; border: 8px solid; border-image: linear-gradient(to right, var(--preto-borda) 50%, var(--laranja-wm) 50%) 1; box-shadow: 0 5px 25px rgba(0,0,0,0.6); box-sizing: border-box; position: relative; border-radius: 4px; }
 
         header { background-color: white; color: var(--azul-wm); padding: 15px 10px; text-align: center; font-weight: bold; display: flex; flex-direction: column; align-items: center; gap: 10px; border-bottom: 2px solid #ddd; }
 
@@ -107,10 +143,17 @@
         #modal-foto { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; }
         #foto-ampliada { max-width: 90%; max-height: 80%; border: 3px solid white; pointer-events: none; }
 
+        /* ========================================== */
+        /* 🛡️ TELA DE LOGIN E MODAL: FUNDO PRETO 🛡️ */
+        /* ========================================== */
         #tela-login, #modal-acao {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--azul-wm); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000000; /* Fundo alterado para preto */
+            z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
-        #modal-acao { background: rgba(26, 35, 58, 0.9); display: none; }
+        #modal-acao { background: #000000; display: none; } /* Modal também com fundo preto */
+
         .login-box { background: white; padding: 25px; border-radius: 10px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         .login-box img { max-height: 60px; margin-bottom: 10px; object-fit: contain; pointer-events: none; }
     </style>
@@ -368,12 +411,22 @@
 
     let acaoPendente = '';
 
+    // Função utilitária para travar/destravar o scroll do corpo
+    function toggleBodyScroll(lock) {
+        if (lock) {
+            document.body.classList.add('no-scroll');
+        } else {
+            document.body.classList.remove('no-scroll');
+        }
+    }
+
     // ==========================================
     // INICIALIZAÇÃO ROBUSTA E SESSÃO ISOLADA
     // ==========================================
     function inicializarAppOffline() {
         if (localStorage.getItem('wm_refeicoes_sessao_ativa') === 'true') {
             document.getElementById('tela-login').style.display = 'none';
+            toggleBodyScroll(false); // Garante scroll destravado na entrada
             if (document.getElementById('tela-planilha').style.display !== 'block') {
                 document.getElementById('tela-principal').style.display = 'block';
             }
@@ -381,6 +434,7 @@
             document.getElementById('tela-principal').style.display = 'none';
             document.getElementById('tela-planilha').style.display = 'none';
             document.getElementById('tela-login').style.display = 'flex';
+            toggleBodyScroll(true); // Trava scroll na tela de login
         }
         
         calcularTotal();
@@ -494,6 +548,7 @@
             document.getElementById('tela-principal').style.display = 'block'; 
             document.getElementById('senha-input').value = '';
             document.getElementById('erro-login').style.display = 'none';
+            toggleBodyScroll(false); // Destrava o scroll ao logar
         } else {
             document.getElementById('erro-login').style.display = 'block';
         }
@@ -507,12 +562,20 @@
     }
 
     function sairDoApp() {
+        // Antes de sair, garante que o rascunho atual foi salvo
+        gravarConfiguracoesSalvas();
         localStorage.removeItem('wm_refeicoes_sessao_ativa');
+        
+        // Esconde as telas principais
         document.getElementById('tela-principal').style.display = 'none';
         document.getElementById('tela-planilha').style.display = 'none';
+        
+        // Mostra o login e trava o scroll
         document.getElementById('tela-login').style.display = 'flex';
         document.getElementById('senha-input').value = '';
-        alert('✅ Sessão encerrada. Você saiu do aplicativo.');
+        toggleBodyScroll(true);
+        
+        alert('✅ Rascunhos salvos. Sessão encerrada.');
     }
 
     function solicitarSenhaAcao(acao) {
@@ -520,6 +583,7 @@
         document.getElementById('senha-acao-input').value = '';
         document.getElementById('erro-senha-acao').style.display = 'none';
         document.getElementById('modal-acao').style.display = 'flex';
+        toggleBodyScroll(true); // Trava o scroll ao abrir o modal
 
         if(acao === 'encerrar') {
             document.getElementById('texto-acao-modal').innerText = "Senha necessária para APAGAR TUDO E SAIR";
@@ -529,6 +593,7 @@
     function fecharModalAcao() {
         document.getElementById('modal-acao').style.display = 'none';
         acaoPendente = '';
+        toggleBodyScroll(false); // Destrava o scroll ao fechar o modal
     }
 
     function mostrarSenhaAcao() {
@@ -548,6 +613,7 @@
                 encerrarRelatorio();
             }
             acaoPendente = '';
+            // Nota: toggleBodyScroll(false) será chamado dentro de encerrarRelatorio() ao voltar pro login.
         } else {
             document.getElementById('erro-senha-acao').style.display = 'block';
         }
@@ -795,17 +861,20 @@
     function gerarPDF() { abrirPlanilha(); setTimeout(() => { window.print(); }, 1500); }
 
     function encerrarRelatorio() { 
-        if(confirm("Apagar toda a ficha do aparelho? Faça isso apenas DEPOIS de gerar e enviar o PDF!")) { 
+        if(confirm("Zerar tudo? Você perderá todos os dados não salvos no PDF!")) { 
             
+            // 1. Apaga APENAS os dados deste app da memória
             localStorage.removeItem('wm_registros_refeicao');
             localStorage.removeItem('wm_campos_salvos'); 
             localStorage.removeItem('wm_refeicoes_sessao_ativa'); 
             
+            // 2. Limpa variáveis e tabelas visualmente
             banco = [];
             indiceEdicao = -1;
             calcularTotal();
             document.getElementById('corpo-tabela').innerHTML = "";
 
+            // 3. Zera os campos da tela
             document.getElementById('nome-completo').value = '';
             document.getElementById('cpf').value = '';
             document.getElementById('empresa').value = '';
@@ -832,14 +901,17 @@
             document.getElementById('preco-jantar').value = '';
             verificarCondicionais();
             
+            // 4. Esconde as telas e volta pro login na mesma hora
             document.getElementById('tela-principal').style.display = 'none';
             document.getElementById('tela-planilha').style.display = 'none';
             document.getElementById('tela-login').style.display = 'flex';
             
+            // 5. Trava o scroll e zera a senha
+            toggleBodyScroll(true);
             document.getElementById('senha-input').value = '';
             document.getElementById('erro-login').style.display = 'none';
             
-            alert("✅ Dados apagados com sucesso! Você saiu do aplicativo.");
+            alert("✅ Tudo zerado e sessão apagada com sucesso!");
         } 
     }
 
@@ -857,6 +929,7 @@
                 try {
                     const nomesCaches = await caches.keys();
                     await Promise.all(nomesCaches.map(nome => {
+                        // Apaga SOMENTE o cache deste app para forçar o download novo
                         if (nome.startsWith('refeicoes-wm-')) return caches.delete(nome);
                     }));
                 } catch (e) {
@@ -870,7 +943,7 @@
 
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js').then(reg => {
-            reg.update(); 
+            reg.update(); // Força a verificação de atualização na inicialização
             reg.onupdatefound = () => {
                 const novoWorker = reg.installing;
                 novoWorker.onstatechange = () => {
@@ -883,9 +956,10 @@
             console.log("Erro no Service Worker:", err);
         });
         
+        // Verifica atualização também quando o app volta a ser visível
         document.addEventListener("visibilitychange", () => {
             if (document.visibilityState === "visible") {
-                document.body.offsetHeight; 
+                document.body.offsetHeight; // Força redesenho
                 if (navigator.serviceWorker) {
                     navigator.serviceWorker.ready.then(reg => reg.update());
                 }
