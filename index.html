@@ -121,7 +121,7 @@
     <div class="login-box">
         <img src="LOGOTIPO.jpg" alt="Logo WM">
         <h3 style="color: var(--azul-wm); margin-top: 0; margin-bottom: 5px;">ACESSO RESTRITO</h3>
-        <p style="color: #666; font-size: 12px; margin-bottom: 5px;">WM Construções - Refeições</p>
+        <p style="color: #666; font-size: 12px; margin-bottom: 5px;">Área exclusiva para funcionários</p>
 
         <div style="position: relative; width: 100%; margin: 15px 0;">
             <input type="password" id="senha-input" placeholder="SENHA" style="width: 100%; margin: 0; padding-right: 40px; text-align: center; font-size: 20px; font-weight: bold; letter-spacing: 2px;">
@@ -302,14 +302,14 @@
                 <input type="file" id="foto-assinatura" accept="image/*" capture="environment">
             </div>
 
-            <button class="btn-salvar" id="btn-salvar-principal" onclick="salvarRefeicao()">✅ Enviar (Salvar Registro)</button>
-            <button class="btn-ver-planilha" onclick="abrirPlanilha()">📊 Ver Registros Diários</button>
+            <button class="btn-salvar" id="btn-salvar-principal" onclick="salvarRefeicao()">✅ Salvar o lançamento</button>
+            <button class="btn-ver-planilha" onclick="abrirPlanilha()">📊 Ver os lançamentos</button>
         </div>
 
         <div class="area-acoes">
-            <button class="btn-pausar" onclick="salvarRascunhoSemSenha()">💾 SALVAR O RASCUNHO</button>
+            <button class="btn-pausar" onclick="sairDoApp()">🚪 SAIR</button>
             <button class="btn-whats" onclick="gerarPDF()">📲 GERAR RELATÓRIO PDF</button>
-            <button class="btn-encerrar" onclick="solicitarSenhaAcao('encerrar')">🏁 ENCERRAR A REFEIÇÃO</button>
+            <button class="btn-encerrar" onclick="solicitarSenhaAcao('encerrar')">🗑️ APAGAR TUDO E SAIR</button>
             <button class="btn-whats" onclick="atualizarAppSeguro()" style="background-color: #34495e; margin-top: 5px;">🔄 ATUALIZAR APLICATIVO</button>
         </div>
     </div>
@@ -506,9 +506,13 @@
         else { input.type = 'password'; icone.src = 'OLHOFECHADO_V2.png'; }
     }
 
-    function salvarRascunhoSemSenha() {
-        localStorage.setItem('wm_refeicoes_sessao_ativa', 'true');
-        alert('✅ RASCUNHO SALVO COM SUCESSO');
+    function sairDoApp() {
+        localStorage.removeItem('wm_refeicoes_sessao_ativa');
+        document.getElementById('tela-principal').style.display = 'none';
+        document.getElementById('tela-planilha').style.display = 'none';
+        document.getElementById('tela-login').style.display = 'flex';
+        document.getElementById('senha-input').value = '';
+        alert('✅ Sessão encerrada. Você saiu do aplicativo.');
     }
 
     function solicitarSenhaAcao(acao) {
@@ -518,7 +522,7 @@
         document.getElementById('modal-acao').style.display = 'flex';
 
         if(acao === 'encerrar') {
-            document.getElementById('texto-acao-modal').innerText = "Senha necessária para ENCERRAR A REFEIÇÃO";
+            document.getElementById('texto-acao-modal').innerText = "Senha necessária para APAGAR TUDO E SAIR";
         }
     }
 
@@ -704,14 +708,14 @@
             document.getElementById('foto-local').value = ''; 
             document.getElementById('foto-assinatura').value = ''; 
 
-            document.getElementById('btn-salvar-principal').innerText = "✅ Enviar (Salvar Registro)";
+            document.getElementById('btn-salvar-principal').innerText = "✅ Salvar o lançamento";
             document.getElementById('erro-cpf').style.display = 'none';
             calcularTotal(); 
             verificarCondicionais();
             alert("✔️ Registro Salvo com Sucesso!");
         } catch (e) {
             alert("❌ Memória do celular cheia! Gere o PDF e limpe a ficha.");
-            document.getElementById('btn-salvar-principal').innerText = "✅ Enviar (Salvar Registro)";
+            document.getElementById('btn-salvar-principal').innerText = "✅ Salvar o lançamento";
         }
     }
 
@@ -783,7 +787,7 @@
         verificarCondicionais();
         document.getElementById('erro-cpf').style.display = 'none';
         indiceEdicao = index;
-        document.getElementById('btn-salvar-principal').innerText = "💾 Atualizar Registro";
+        document.getElementById('btn-salvar-principal').innerText = "💾 Atualizar Lançamento";
         voltarParaFormulario();
     }
 
@@ -835,7 +839,7 @@
             document.getElementById('senha-input').value = '';
             document.getElementById('erro-login').style.display = 'none';
             
-            alert("✅ Relatório encerrado, dados e sessão apagados com sucesso!");
+            alert("✅ Dados apagados com sucesso! Você saiu do aplicativo.");
         } 
     }
 
@@ -843,6 +847,11 @@
     // 🔄 FUNÇÃO DE ATUALIZAÇÃO SEGURA DO APLICATIVO
     // ==========================================
     async function atualizarAppSeguro() {
+        if (!navigator.onLine) {
+            alert("❌ O aplicativo só atualiza online!");
+            return;
+        }
+
         if(confirm("Deseja buscar a versão mais recente do aplicativo? (Seus dados salvos NÃO serão perdidos)")) {
             if ('caches' in window) {
                 try {
@@ -854,7 +863,8 @@
                     console.error("Erro ao limpar o cache isolado:", e);
                 }
             }
-            window.location.reload();
+            alert("✔️ Aplicativo atualizado!");
+            window.location.href = window.location.pathname + '?atualizar=' + new Date().getTime();
         }
     }
 
