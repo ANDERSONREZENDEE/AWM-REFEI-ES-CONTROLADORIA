@@ -32,7 +32,6 @@
             --preto-borda: #000000;
         }
 
-        /* Classe para bloquear a rolagem do corpo */
         .no-scroll {
             overflow: hidden !important;
             height: 100% !important;
@@ -44,24 +43,19 @@
         body { 
             font-family: Arial, sans-serif; margin: 0; display: flex; justify-content: center; padding: 10px; 
             -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; -webkit-touch-callout: none;
-            
-            /* Gradiente de fundo base (roxo profundo para violeta) */
             background: linear-gradient(135deg, var(--fundo) 0%, #1a0a2e 40%, #050e20 100%);
             background-attachment: fixed;
             position: relative;
         }
 
-        /* Camada para nebulosas e sobreposição de estrelas */
         body::before {
             content: "";
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
-            /* Nebulosas simuladas com radial-gradients transparentes */
             background-image: 
                 radial-gradient(circle at 20% 30%, rgba(100, 0, 150, 0.4) 0%, transparent 60%),
                 radial-gradient(circle at 80% 70%, rgba(50, 0, 100, 0.3) 0%, transparent 50%),
-                /* Estrelas simuladas */
                 radial-gradient(1px 1px at 10% 10%, #fff, rgba(0,0,0,0)),
                 radial-gradient(2px 2px at 30% 50%, #fff, rgba(0,0,0,0)),
                 radial-gradient(1px 1px at 70% 20%, #fff, rgba(0,0,0,0)),
@@ -74,13 +68,14 @@
         input, select, textarea {
             box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; width: 100%; padding: 10px; margin-top: 3px;
             -webkit-user-select: auto; -moz-user-select: auto; -ms-user-select: auto; user-select: auto;
+            transition: border 0.3s ease;
         }
 
-        /* ⚠️ CONTORNO BRANCO MAIS GROSSO (5px) PARA DESTACAR BEM DO FUNDO */
+        /* ⚠️ CONTORNO BRANCO AUMENTADO PARA 8px */
         .app-container { 
             width: 100%; max-width: 700px; background-color: #f4f7f6; min-height: 95vh; 
             border: 8px solid; border-image: linear-gradient(to right, var(--preto-borda) 50%, var(--laranja-wm) 50%) 1; 
-            box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.95), 0 5px 25px rgba(0,0,0,0.8); 
+            box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.95), 0 5px 25px rgba(0,0,0,0.8); 
             box-sizing: border-box; position: relative; border-radius: 4px; 
         }
 
@@ -89,10 +84,10 @@
         .logos-container { display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 15px; width: 100%; box-sizing: border-box; padding: 0 10px; overflow: hidden; }
         .logo-wm, .logo-controladoria { max-width: 45%; max-height: 60px; object-fit: contain; pointer-events: none; }
 
-        .titulo-header { font-size: 15px; color: var(--laranja-wm); margin-top: 5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+        .titulo-header { font-size: 14px; color: var(--laranja-wm); margin-top: 5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
 
         .painel-saldo, .formulario, .area-acoes { background: white; margin: 10px; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .saldo-atual { font-size: 20px; font-weight: bold; text-align: center; margin-top: 5px; color: var(--azul-wm); }
+        .saldo-atual { font-size: 17px; font-weight: bold; text-align: center; margin-top: 5px; color: var(--azul-wm); }
 
         .formulario { display: flex; flex-direction: column; gap: 8px; }
         
@@ -205,12 +200,12 @@
                 <img src="LOGOTIPO.jpg" alt="WM" class="logo-wm">
                 <img src="Captura de tela 2026-02-13 132630.jpg" alt="Controladoria" class="logo-controladoria">
             </div>
-            <div class="titulo-header">🍽️ AWM REFEIÇÕES 🍽️</div>
+            <div class="titulo-header">✨ VERSÃO DE ATUALIZAÇÃO 1 DO APLICATIVO ✨</div>
         </header>
 
         <div class="painel-saldo">
-            <div class="saldo-atual" id="total-registros">0 Refeições Registradas</div>
-            <p style="text-align: center; font-size: 11px; color: #777; margin-top: 5px;">(Neste dispositivo)</p>
+            <div class="saldo-atual" id="total-registros">0 REFEIÇÕES REGISTRADAS NO DIA</div>
+            <p style="text-align: center; font-size: 11px; color: #777; margin-top: 5px;" id="display-device-id"></p>
         </div>
 
         <div class="formulario">
@@ -347,7 +342,7 @@
 
             <div style="background: #e2e8f0; padding: 10px; border-radius: 5px; border: 1px solid #cbd5e1; margin-top: 5px;">
                 <div class="label-linha" style="margin-top: 0;">
-                    <label>Tabela de Preços (R$):</label>
+                    <label>Tabela de Preços (R$): <span style="color:red">*</span></label>
                 </div>
                 <div style="display: flex; gap: 8px; margin-top: 5px;">
                     <div style="flex: 1;">
@@ -448,6 +443,8 @@
     const HASH_SENHA_MESTRA = String.fromCharCode(..._s);
 
     let acaoPendente = '';
+    let banco = JSON.parse(localStorage.getItem('wm_registros_refeicao')) || [];
+    let indiceEdicao = -1; 
 
     // Função utilitária para travar/destravar o scroll do corpo
     function toggleBodyScroll(lock) {
@@ -455,6 +452,20 @@
             document.body.classList.add('no-scroll');
         } else {
             document.body.classList.remove('no-scroll');
+        }
+    }
+
+    // Função de Guia: Rola a tela até o erro e destaca em vermelho
+    function focarErro(idOriginal, idCondicional, condicao, mensagem) {
+        alert(mensagem);
+        let idFoco = (condicao && idCondicional) ? idCondicional : idOriginal;
+        let elemento = document.getElementById(idFoco);
+        if(elemento) {
+            elemento.scrollIntoView({behavior: "smooth", block: "center"});
+            elemento.focus();
+            let bordaOriginal = elemento.style.border;
+            elemento.style.border = "2px solid red";
+            setTimeout(() => { elemento.style.border = bordaOriginal; }, 3000);
         }
     }
 
@@ -577,7 +588,6 @@
         document.getElementById('div-qual-obra').style.display = document.getElementById('obra').value === 'Outra Obra' ? 'block' : 'none';
         document.getElementById('div-qual-restaurante').style.display = document.getElementById('restaurante').value === 'Outro Restaurante' ? 'block' : 'none';
         
-        // Garante que a escolha principal seja salva se for mudada sem digitar no campo de texto
         gravarConfiguracoesSalvas();
     }
 
@@ -666,11 +676,15 @@
         }
     }
 
-    let banco = JSON.parse(localStorage.getItem('wm_registros_refeicao')) || [];
-    let indiceEdicao = -1; 
-
     function calcularTotal() {
-        document.getElementById('total-registros').innerText = banco.length + " Refeições Registradas";
+        let dataAtual = new Date().toLocaleDateString('pt-BR');
+        // Conta apenas os registros do dia de hoje
+        let registrosHoje = banco.filter(item => item.dataReg === dataAtual).length;
+        
+        let textoFinal = registrosHoje === 1 ? " REFEIÇÃO REGISTRADA NO DIA" : " REFEIÇÕES REGISTRADAS NO DIA";
+        document.getElementById('total-registros').innerText = registrosHoje + textoFinal;
+        
+        document.getElementById('display-device-id').innerText = "APARELHO ID: " + getDeviceID();
     }
 
     function validarCPF(cpf) {
@@ -739,25 +753,37 @@
         
         let selRefeicao = document.getElementById('refeicao').value;
 
-        let valPreco = "R$ 0,00";
-        if (selRefeicao === "Café da manhã") valPreco = document.getElementById('preco-cafe').value || "R$ 0,00";
-        if (selRefeicao === "Almoço") valPreco = document.getElementById('preco-almoco').value || "R$ 0,00";
-        if (selRefeicao === "Jantar") valPreco = document.getElementById('preco-jantar').value || "R$ 0,00";
+        let pCafe = document.getElementById('preco-cafe').value;
+        let pAlmoco = document.getElementById('preco-almoco').value;
+        let pJantar = document.getElementById('preco-jantar').value;
 
         let fotoLocalInput = document.getElementById('foto-local').files[0];
         let fotoAssinaturaInput = document.getElementById('foto-assinatura').files[0];
 
-        if(!nome || !cpf) return alert("⚠️ Atenção: Preencha Nome Completo e CPF!");
-        if(!validarCPF(cpf)) { document.getElementById('erro-cpf').style.display = 'block'; return alert("❌ CPF INVÁLIDO!!! Verifique o número digitado."); }
-        if (!selEmpresa || (selEmpresa === 'Outra Empresa' && !txtEmpresa)) return alert("⚠️ Informe a Empresa!");
-        if (!selFuncao || (selFuncao === 'Outra Função' && !txtFuncao)) return alert("⚠️ Informe a Função!");
-        if (!selObra || (selObra === 'Outra Obra' && !txtObra)) return alert("⚠️ Informe a Obra!");
-        if (!selRestaurante || (selRestaurante === 'Outro Restaurante' && !txtRestaurante)) return alert("⚠️ Informe o Restaurante!");
-        if (!selRefeicao) return alert("⚠️ Selecione a Refeição Atendida!");
+        // Validações com Foco Automático no Erro
+        if(!nome) return focarErro('nome-completo', null, false, "⚠️ Atenção: Preencha o Nome Completo!");
+        if(!cpf) return focarErro('cpf', null, false, "⚠️ Atenção: Preencha o CPF!");
+        if(!validarCPF(cpf)) { document.getElementById('erro-cpf').style.display = 'block'; return focarErro('cpf', null, false, "❌ CPF INVÁLIDO!!! Verifique o número digitado."); }
         
-        if (indiceEdicao < 0 && (!fotoLocalInput || !fotoAssinaturaInput)) {
-            return alert("⚠️ Atenção: As fotos do Local e da Assinatura são obrigatórias!");
-        }
+        if (!selEmpresa || (selEmpresa === 'Outra Empresa' && !txtEmpresa)) return focarErro('empresa', 'qual-empresa', selEmpresa === 'Outra Empresa', "⚠️ Informe a Empresa!");
+        if (!selFuncao || (selFuncao === 'Outra Função' && !txtFuncao)) return focarErro('funcao', 'qual-funcao', selFuncao === 'Outra Função', "⚠️ Informe a Função!");
+        if (!selObra || (selObra === 'Outra Obra' && !txtObra)) return focarErro('obra', 'qual-obra', selObra === 'Outra Obra', "⚠️ Informe a Obra!");
+        if (!selRestaurante || (selRestaurante === 'Outro Restaurante' && !txtRestaurante)) return focarErro('restaurante', 'qual-restaurante', selRestaurante === 'Outro Restaurante', "⚠️ Informe o Restaurante!");
+        
+        if (!pCafe || pCafe === "R$ 0,00" || pCafe === "R$ ") return focarErro('preco-cafe', null, false, "⚠️ Obrigatório: Informe o preço do Café na tabela!");
+        if (!pAlmoco || pAlmoco === "R$ 0,00" || pAlmoco === "R$ ") return focarErro('preco-almoco', null, false, "⚠️ Obrigatório: Informe o preço do Almoço na tabela!");
+        if (!pJantar || pJantar === "R$ 0,00" || pJantar === "R$ ") return focarErro('preco-jantar', null, false, "⚠️ Obrigatório: Informe o preço do Jantar na tabela!");
+
+        if (!selRefeicao) return focarErro('refeicao', null, false, "⚠️ Selecione a Refeição Atendida!");
+        
+        if (indiceEdicao < 0 && !fotoLocalInput) return focarErro('foto-local', null, false, "⚠️ Atenção: A foto do Local é obrigatória!");
+        if (indiceEdicao < 0 && !fotoAssinaturaInput) return focarErro('foto-assinatura', null, false, "⚠️ Atenção: A foto da Assinatura é obrigatória!");
+
+        // Atribuir o preço com base na refeição selecionada
+        let valPreco = "R$ 0,00";
+        if (selRefeicao === "Café da manhã") valPreco = pCafe;
+        if (selRefeicao === "Almoço") valPreco = pAlmoco;
+        if (selRefeicao === "Jantar") valPreco = pJantar;
 
         // ==========================================
         // 🛡️ TRAVA ANTI-DUPLICIDADE DE REFEIÇÃO
@@ -786,7 +812,7 @@
         let item = {
             nome: nome, cpf: cpf,
             empresa_sel: selEmpresa, empresa_txt: txtEmpresa,
-            funcao_sel: selFuncao, funcao_txt: txtFuncao, // Salva o novo padrão de função
+            funcao_sel: selFuncao, funcao_txt: txtFuncao,
             obra_sel: selObra, obra_txt: txtObra,
             restaurante_sel: selRestaurante, restaurante_txt: txtRestaurante,
             refeicao: selRefeicao,
@@ -808,11 +834,9 @@
 
         try {
             localStorage.setItem('wm_registros_refeicao', JSON.stringify(banco));
-            
-            // Grava os dados para manter no formulário automático
             gravarConfiguracoesSalvas(); 
 
-            // ⚠️ Limpa APENAS a refeição e as fotos
+            // Limpa APENAS a refeição e as fotos
             document.getElementById('refeicao').value = '';
             document.getElementById('foto-local').value = ''; 
             document.getElementById('foto-assinatura').value = ''; 
@@ -913,18 +937,15 @@
     function encerrarRelatorio() { 
         if(confirm("Zerar tudo? Você perderá todos os dados não salvos no PDF!")) { 
             
-            // 1. Apaga APENAS os dados deste app da memória
             localStorage.removeItem('wm_registros_refeicao');
             localStorage.removeItem('wm_campos_salvos'); 
             localStorage.removeItem('wm_refeicoes_sessao_ativa'); 
             
-            // 2. Limpa variáveis e tabelas visualmente
             banco = [];
             indiceEdicao = -1;
             calcularTotal();
             document.getElementById('corpo-tabela').innerHTML = "";
 
-            // 3. Zera todos os campos da tela
             document.getElementById('nome-completo').value = '';
             document.getElementById('cpf').value = '';
             document.getElementById('empresa').value = '';
@@ -944,12 +965,10 @@
             document.getElementById('preco-jantar').value = '';
             verificarCondicionais();
             
-            // 4. Esconde as telas e volta pro login na mesma hora
             document.getElementById('tela-principal').style.display = 'none';
             document.getElementById('tela-planilha').style.display = 'none';
             document.getElementById('tela-login').style.display = 'flex';
             
-            // 5. Trava o scroll e zera a senha
             toggleBodyScroll(true);
             document.getElementById('senha-input').value = '';
             document.getElementById('erro-login').style.display = 'none';
@@ -958,9 +977,6 @@
         } 
     }
 
-    // ==========================================
-    // 🔄 FUNÇÃO DE ATUALIZAÇÃO SEGURA DO APLICATIVO
-    // ==========================================
     async function atualizarAppSeguro() {
         if (!navigator.onLine) {
             alert("❌ O aplicativo só atualiza online!");
@@ -972,7 +988,6 @@
                 try {
                     const nomesCaches = await caches.keys();
                     await Promise.all(nomesCaches.map(nome => {
-                        // Apaga SOMENTE o cache deste app para forçar o download novo
                         if (nome.startsWith('refeicoes-wm-')) return caches.delete(nome);
                     }));
                 } catch (e) {
@@ -986,7 +1001,7 @@
 
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js').then(reg => {
-            reg.update(); // Força a verificação de atualização na inicialização
+            reg.update(); 
             reg.onupdatefound = () => {
                 const novoWorker = reg.installing;
                 novoWorker.onstatechange = () => {
@@ -999,10 +1014,9 @@
             console.log("Erro no Service Worker:", err);
         });
         
-        // Verifica atualização também quando o app volta a ser visível
         document.addEventListener("visibilitychange", () => {
             if (document.visibilityState === "visible") {
-                document.body.offsetHeight; // Força redesenho
+                document.body.offsetHeight; 
                 if (navigator.serviceWorker) {
                     navigator.serviceWorker.ready.then(reg => reg.update());
                 }
