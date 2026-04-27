@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Área exclusiva para funcionários</title>
 
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icone_v3.png">
-    <link rel="icon" type="image/png" href="icone_v3.png">
+    <link rel="manifest" href="manifest.json?v=7">
+    <link rel="apple-touch-icon" href="icone_refeicao_v7.png?v=7">
+    <link rel="icon" type="image/png" href="icone_refeicao_v7.png?v=7">
 
     <script>
         // Bloqueio de F12 e inspeção
@@ -34,12 +34,9 @@
 
         .no-scroll {
             overflow: hidden !important;
-            height: 100% !important;
+            height: 100vh !important;
         }
 
-        /* ========================================== */
-        /* 🛡️ NOVO FUNDO ESPACIAL (SIMULADO VIA CSS) 🛡️ */
-        /* ========================================== */
         body { 
             font-family: Arial, sans-serif; margin: 0; display: flex; justify-content: center; padding: 10px; 
             -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; -webkit-touch-callout: none;
@@ -71,7 +68,6 @@
             transition: border 0.3s ease;
         }
 
-        /* ⚠️ CONTORNO BRANCO AUMENTADO PARA 8px */
         .app-container { 
             width: 100%; max-width: 700px; background-color: #f4f7f6; min-height: 95vh; 
             border: 8px solid; border-image: linear-gradient(to right, var(--preto-borda) 50%, var(--laranja-wm) 50%) 1; 
@@ -141,16 +137,13 @@
         #modal-foto { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; }
         #foto-ampliada { max-width: 90%; max-height: 80%; border: 3px solid white; pointer-events: none; }
 
-        /* ========================================== */
-        /* 🛡️ TELA DE LOGIN E MODAL: FUNDO PRETO 🛡️ */
-        /* ========================================== */
         #tela-login, #modal-acao {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000000;
+            background: #000000; /* Fundo sólido corrigido */
             z-index: 9999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
-        #modal-acao { background: #000000; display: none; }
+        #modal-acao { display: none; }
 
         .login-box { background: white; padding: 25px; border-radius: 10px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         .login-box img { max-height: 60px; margin-bottom: 10px; object-fit: contain; pointer-events: none; }
@@ -439,14 +432,9 @@
 </div>
 
 <script>
-    const _s = [53, 52, 52, 102, 55, 55, 97, 49, 102, 50, 50, 97, 51, 53, 50, 99, 52, 49, 54, 48, 56, 53, 56, 98, 50, 100, 55, 56, 55, 99, 98, 97, 57, 53, 55, 54, 98, 101, 54, 100, 55, 48, 98, 48, 101, 100, 53, 51, 98, 55, 52, 97, 56, 49, 51, 57, 99, 97, 56, 54, 49, 97, 54, 49];
-    const HASH_SENHA_MESTRA = String.fromCharCode(..._s);
-
-    let acaoPendente = '';
-    let banco = JSON.parse(localStorage.getItem('wm_registros_refeicao')) || [];
-    let indiceEdicao = -1; 
-
-    // Função utilitária para travar/destravar o scroll do corpo
+    // ==========================================
+    // FUNÇÃO QUE TRAVA O SCROLL (ADICIONADA)
+    // ==========================================
     function toggleBodyScroll(lock) {
         if (lock) {
             document.body.classList.add('no-scroll');
@@ -455,7 +443,16 @@
         }
     }
 
-    // Função de Guia: Rola a tela até o erro e destaca em vermelho
+    // ==========================================
+    // FUNÇÃO QUE LÊ OS ATALHOS DO ÍCONE
+    // ==========================================
+    function verificarAtalhos() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('tela') === 'planilha') {
+            abrirPlanilha(); 
+        }
+    }
+
     function focarErro(idOriginal, idCondicional, condicao, mensagem) {
         alert(mensagem);
         let idFoco = (condicao && idCondicional) ? idCondicional : idOriginal;
@@ -469,9 +466,13 @@
         }
     }
 
-    // ==========================================
-    // INICIALIZAÇÃO ROBUSTA E SESSÃO ISOLADA
-    // ==========================================
+    const _s = [53, 52, 52, 102, 55, 55, 97, 49, 102, 50, 50, 97, 51, 53, 50, 99, 52, 49, 54, 48, 56, 53, 56, 98, 50, 100, 55, 56, 55, 99, 98, 97, 57, 53, 55, 54, 98, 101, 54, 100, 55, 48, 98, 48, 101, 100, 53, 51, 98, 55, 52, 97, 56, 49, 51, 57, 99, 97, 56, 54, 49, 97, 54, 49];
+    const HASH_SENHA_MESTRA = String.fromCharCode(..._s);
+
+    let acaoPendente = '';
+    let banco = JSON.parse(localStorage.getItem('wm_registros_refeicao')) || [];
+    let indiceEdicao = -1; 
+
     function inicializarAppOffline() {
         if (localStorage.getItem('wm_refeicoes_sessao_ativa') === 'true') {
             document.getElementById('tela-login').style.display = 'none';
@@ -489,6 +490,7 @@
         calcularTotal();
         carregarConfiguracoesSalvas(); 
         document.body.offsetHeight; 
+        verificarAtalhos(); // Chamada adicionada aqui!
     }
 
     document.addEventListener('DOMContentLoaded', inicializarAppOffline);
@@ -671,6 +673,7 @@
                 encerrarRelatorio();
             }
             acaoPendente = '';
+            toggleBodyScroll(false); 
         } else {
             document.getElementById('erro-senha-acao').style.display = 'block';
         }
@@ -678,7 +681,6 @@
 
     function calcularTotal() {
         let dataAtual = new Date().toLocaleDateString('pt-BR');
-        // Conta apenas os registros do dia de hoje
         let registrosHoje = banco.filter(item => item.dataReg === dataAtual).length;
         
         let textoFinal = registrosHoje === 1 ? " REFEIÇÃO REGISTRADA NO DIA" : " REFEIÇÕES REGISTRADAS NO DIA";
@@ -760,7 +762,6 @@
         let fotoLocalInput = document.getElementById('foto-local').files[0];
         let fotoAssinaturaInput = document.getElementById('foto-assinatura').files[0];
 
-        // Validações com Foco Automático no Erro
         if(!nome) return focarErro('nome-completo', null, false, "⚠️ Atenção: Preencha o Nome Completo!");
         if(!cpf) return focarErro('cpf', null, false, "⚠️ Atenção: Preencha o CPF!");
         if(!validarCPF(cpf)) { document.getElementById('erro-cpf').style.display = 'block'; return focarErro('cpf', null, false, "❌ CPF INVÁLIDO!!! Verifique o número digitado."); }
@@ -779,15 +780,11 @@
         if (indiceEdicao < 0 && !fotoLocalInput) return focarErro('foto-local', null, false, "⚠️ Atenção: A foto do Local é obrigatória!");
         if (indiceEdicao < 0 && !fotoAssinaturaInput) return focarErro('foto-assinatura', null, false, "⚠️ Atenção: A foto da Assinatura é obrigatória!");
 
-        // Atribuir o preço com base na refeição selecionada
         let valPreco = "R$ 0,00";
         if (selRefeicao === "Café da manhã") valPreco = pCafe;
         if (selRefeicao === "Almoço") valPreco = pAlmoco;
         if (selRefeicao === "Jantar") valPreco = pJantar;
 
-        // ==========================================
-        // 🛡️ TRAVA ANTI-DUPLICIDADE DE REFEIÇÃO
-        // ==========================================
         let dataAtual = new Date();
         let dataFormatada = dataAtual.toLocaleDateString('pt-BR');
         
@@ -836,7 +833,6 @@
             localStorage.setItem('wm_registros_refeicao', JSON.stringify(banco));
             gravarConfiguracoesSalvas(); 
 
-            // Limpa APENAS a refeição e as fotos
             document.getElementById('refeicao').value = '';
             document.getElementById('foto-local').value = ''; 
             document.getElementById('foto-assinatura').value = ''; 
