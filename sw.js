@@ -1,5 +1,5 @@
 const PREFIXO_CACHE = 'refeicoes-wm-';
-const CACHE_NAME = PREFIXO_CACHE + 'v7'; 
+const CACHE_NAME = PREFIXO_CACHE + 'v8';
 
 const arquivosParaGuardar = [
   './',
@@ -7,7 +7,7 @@ const arquivosParaGuardar = [
   './manifest.json',
   './sw.js',
   './LOGOTIPO.jpg',
-  './Captura de tela 2026-02-13 132630.jpg',
+  './controladoria.jpg',
   './icone_refeicao_v7.png',
   './OLHOABERTO.png',
   './OLHOFECHADO_V2.png'
@@ -39,10 +39,8 @@ self.addEventListener('fetch', evento => {
   evento.respondWith(
     caches.match(evento.request, { ignoreSearch: true })
       .then(respostaCache => {
-        if (respostaCache) {
-          return respostaCache; 
-        }
-        
+        if (respostaCache) return respostaCache;
+
         return fetch(evento.request).then(respostaRede => {
           return caches.open(CACHE_NAME).then(cache => {
             if (evento.request.method === 'GET' && respostaRede.status === 200) {
