@@ -1,7 +1,6 @@
 const PREFIXO_CACHE = 'refeicoes-wm-';
-const CACHE_NAME = PREFIXO_CACHE + 'v6'; // Atualizado para v6 para forçar a mudança no celular
+const CACHE_NAME = PREFIXO_CACHE + 'v7'; 
 
-// Arquivos principais para guardar offline imediatamente
 const arquivosParaGuardar = [
   './',
   './index.html',
@@ -9,7 +8,7 @@ const arquivosParaGuardar = [
   './sw.js',
   './LOGOTIPO.jpg',
   './Captura de tela 2026-02-13 132630.jpg',
-  './icone_v3.png',
+  './icone_refeicao_v7.png',
   './OLHOABERTO.png',
   './OLHOFECHADO_V2.png'
 ];
@@ -26,7 +25,6 @@ self.addEventListener('activate', evento => {
     caches.keys().then(nomesCaches => {
       return Promise.all(
         nomesCaches.map(nomeCache => {
-          // Só apaga se pertencer ao App de Refeições E for uma versão velha
           if (nomeCache.startsWith(PREFIXO_CACHE) && nomeCache !== CACHE_NAME) {
             return caches.delete(nomeCache);
           }
@@ -55,7 +53,6 @@ self.addEventListener('fetch', evento => {
         });
       }).catch(() => {
         if (evento.request.mode === 'navigate') {
-          // ✅ CORREÇÃO APLICADA AQUI: Redireciona direto para o index
           return caches.match('./index.html', { ignoreSearch: true });
         }
       })
