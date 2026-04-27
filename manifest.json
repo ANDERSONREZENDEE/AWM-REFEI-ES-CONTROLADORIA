@@ -23,8 +23,7 @@
   "shortcuts": [
     {
       "name": "Nova Refeição",
-      "short_name": "Novo Gasto",
-      "description": "Adicionar nova refeição",
+      "short_name": "Nova",
       "url": "./index.html",
       "icons": [
         {
@@ -37,7 +36,6 @@
     {
       "name": "Ver Planilha",
       "short_name": "Planilha",
-      "description": "Acessar relatório de refeições",
       "url": "./index.html?tela=planilha",
       "icons": [
         {
