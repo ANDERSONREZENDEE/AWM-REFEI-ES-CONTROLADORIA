@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Área exclusiva para funcionários</title>
 
-    <link rel="manifest" href="manifest.json?v=8">
-    <link rel="apple-touch-icon" href="icone_refeicao_v7.png?v=8">
-    <link rel="icon" type="image/png" href="icone_refeicao_v7.png?v=8">
+    <link rel="manifest" href="manifest.json?v=9">
+    <link rel="apple-touch-icon" href="icone_refeicao_v7.png?v=9">
+    <link rel="icon" type="image/png" href="icone_refeicao_v7.png?v=9">
 
     <script>
         // Bloqueio de F12 e inspeção
@@ -78,7 +78,8 @@
         header { background-color: white; color: var(--azul-wm); padding: 15px 10px; text-align: center; font-weight: bold; display: flex; flex-direction: column; align-items: center; gap: 10px; border-bottom: 2px solid #ddd; }
 
         .logos-container { display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 15px; width: 100%; box-sizing: border-box; padding: 0 10px; overflow: hidden; }
-        .logo-wm, .logo-controladoria { max-width: 45%; max-height: 60px; object-fit: contain; pointer-events: none; }
+         .logo-wm, .logo-controladoria { max-width: 45%; max-height: 60px; object-fit: contain; pointer-events: none; }
+        .logo-controladoria { min-width: 120px; height: auto; display: block; }
 
         .titulo-header { font-size: 14px; color: var(--laranja-wm); margin-top: 5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
 
@@ -198,7 +199,7 @@
         <header>
             <div class="logos-container">
                 <img src="LOGOTIPO.jpg" alt="WM" class="logo-wm">
-                <img src="controladoria.jpg" alt="Controladoria" class="logo-controladoria">
+                <img src="controladoria.jpg" onerror="this.onerror=null; this.src='Captura%20de%20tela%202026-02-13%20132630.jpg';" alt="Controladoria" class="logo-controladoria">
             </div>
             <div class="titulo-header">✨ VERSÃO DE ATUALIZAÇÃO 1 DO APLICATIVO ✨</div>
         </header>
@@ -401,7 +402,7 @@
                     <small id="print-data-emissao"></small>
                     <small id="print-device-id" style="color: #888; margin-top:3px;"></small>
                 </div>
-                <img src="controladoria.jpg" class="img-cabecalho">
+                <img src="controladoria.jpg" onerror="this.onerror=null; this.src='Captura%20de%20tela%202026-02-13%20132630.jpg';" class="img-cabecalho">
             </div>
             <div style="text-align: center; margin-top: 10px; font-weight: bold;">
                 TOTAL DE REFEIÇÕES: <span id="print-total" style="color: red; font-size: 14px;">0</span> | 
