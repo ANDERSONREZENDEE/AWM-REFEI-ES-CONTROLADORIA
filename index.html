@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Área exclusiva para funcionários</title>
+    <title>WM REFEIÇÕES</title>
 
     <link rel="manifest" href="manifest.json?v=9">
     <link rel="apple-touch-icon" href="icone_refeicao_v7.png?v=9">
@@ -201,7 +201,7 @@
                 <img src="LOGOTIPO.jpg" alt="WM" class="logo-wm">
                 <img src="controladoria.jpg" onerror="this.onerror=null; this.src='Captura%20de%20tela%202026-02-13%20132630.jpg';" alt="Controladoria" class="logo-controladoria">
             </div>
-            <div class="titulo-header">✨ VERSÃO DE ATUALIZAÇÃO 1 DO APLICATIVO ✨</div>
+            <div class="titulo-header">✨ GESTÃO INTELIGENTE DE REFEIÇÕES ✨</div>
         </header>
 
         <div class="painel-saldo">
@@ -379,12 +379,12 @@
                 <input type="file" id="foto-assinatura" accept="image/*" capture="environment">
             </div>
 
-            <button class="btn-salvar" id="btn-salvar-principal" onclick="salvarRefeicao()">✅ Salvar o lançamento</button>
-            <button class="btn-ver-planilha" onclick="abrirPlanilha()">📊 Ver os lançamentos</button>
+            <button class="btn-salvar" id="btn-salvar-principal" onclick="salvarRefeicao()">✅ SALVAR OS LANÇAMENTOS</button>
+            <button class="btn-ver-planilha" onclick="abrirPlanilha()">📊 VER OS LANÇAMENTOS</button>
         </div>
 
         <div class="area-acoes">
-            <button class="btn-pausar" onclick="sairDoApp()">🚪 SAIR</button>
+            <button class="btn-pausar" onclick="sairDoApp()">🚪 SALVAR E SAIR</button>
             <button class="btn-whats" onclick="gerarPDF()">📲 GERAR RELATÓRIO PDF</button>
             <button class="btn-encerrar" onclick="solicitarSenhaAcao('encerrar')">🗑️ APAGAR TUDO E SAIR</button>
             <button class="btn-whats" onclick="atualizarAppSeguro()" style="background-color: #34495e; margin-top: 5px;">🔄 ATUALIZAR APLICATIVO</button>
@@ -939,7 +939,7 @@
     function gerarPDF() { abrirPlanilha(); setTimeout(() => { window.print(); }, 1500); }
 
     function encerrarRelatorio() { 
-        if(confirm("Zerar tudo? Você perderá todos os dados não salvos no PDF!")) { 
+        if(confirm("Apagar tudo? Você perderá todos os dados não salvos no PDF!")) { 
             
             localStorage.removeItem('wm_registros_refeicao');
             localStorage.removeItem('wm_campos_salvos'); 
@@ -987,7 +987,7 @@
             return;
         }
 
-        if(confirm("Deseja buscar a versão mais recente do aplicativo? (Seus dados salvos NÃO serão perdidos)")) {
+        if(confirm("Deseja buscar a versão mais recente do aplicativo? (Seus dados salvos não serão perdidos)")) {
             if ('caches' in window) {
                 try {
                     const nomesCaches = await caches.keys();
